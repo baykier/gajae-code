@@ -142,13 +142,14 @@ Runtime behavior:
   chat. A `/sdk`-prefixed message that does not match the
   `/sdk <control|query|global> <operation> [json]` grammar answers with a usage
   hint instead of staying silent.
-- Any other text message is free-form chat: it is dispatched into the bound
-  session as a durable `turn.prompt` control request, and the bot acks with
-  「已提交到会话。」on acceptance. A prompt submitted while the session is
-  mid-run queues for the next idle boundary instead of steering the live run.
-  Failures post a rejection reason instead of staying silent. Without an
-  active bound session free-form text stays silent — send `/sdk` to see the
-  no-session hint.
+- Any other text message is free-form chat and doubles as the instant-reply
+  lane: it is dispatched into the bound session as a `turn.steer` control
+  request, and the bot acks with 「已提交到会话。」on acceptance. While the
+  session is mid-run the text is admitted into the live loop immediately; when
+  idle it becomes a follow-up owned by the next turn. Redelivery is idempotent
+  via the durable steer reconciliation (`clientRef`). Failures post a rejection
+  reason instead of staying silent. Without an active bound session free-form
+  text stays silent — send `/sdk` to see the no-session hint.
 - Live status cards: while a turn runs, the bot keeps one ephemeral card in the
   chat that mirrors the active tool (with ✓/✗ outcome and elapsed duration),
   the latest streamed text (truncated preview), and model/token context,
