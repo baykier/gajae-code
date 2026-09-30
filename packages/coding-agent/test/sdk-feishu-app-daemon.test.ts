@@ -16,7 +16,10 @@ import type { SessionAttachment } from "../src/sdk/router";
 describe("feishu app provider text parsing", () => {
 	test("chunkFeishuAppText keeps short text intact", () => {
 		expect(chunkFeishuAppText("hello")).toEqual(["hello"]);
-		expect(chunkFeishuAppText("")).toEqual([""]);
+	});
+
+	test("chunkFeishuAppText treats empty text as nothing to send", () => {
+		expect(chunkFeishuAppText("")).toEqual([]);
 	});
 
 	test("chunkFeishuAppText splits long text at newline boundaries", () => {

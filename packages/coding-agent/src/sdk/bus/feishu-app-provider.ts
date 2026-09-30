@@ -58,6 +58,7 @@ function readObject(source: unknown, key: string): Record<string, unknown> | und
 
 /** Feishu splits text rendering per message; chunk identical to the webhook transport. */
 export function chunkFeishuAppText(text: string): string[] {
+	if (text.length === 0) return [];
 	if (text.length <= FEISHU_TEXT_CHUNK_CHARS) return [text];
 	const chunks: string[] = [];
 	let cursor = 0;

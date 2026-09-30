@@ -59,6 +59,15 @@ describe("sendFeishuWebhookText", () => {
 		expect(typeof body.sign).toBe("string");
 	});
 
+	test("treats empty text as a no-op success without an HTTP request", async () => {
+		const { calls, fetchImpl } = recorder([{ status: 200, body: { code: 0, msg: "success" } }]);
+		const result = await sendFeishuWebhookText({ webhookUrl: WEBHOOK, text: "" }, { fetchImpl });
+		expect(result.ok).toBe(true);
+		if (!result.ok) throw new Error("expected ok");
+		expect(result.chunks).toBe(0);
+		expect(calls).toHaveLength(0);
+	});
+
 	test("signs in the body: HMAC key is timestamp + newline + secret over an empty message", async () => {
 		const { calls, fetchImpl } = recorder([{ status: 200, body: { code: 0, msg: "success" } }]);
 		const result = await sendFeishuWebhookText(

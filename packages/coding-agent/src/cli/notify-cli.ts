@@ -557,7 +557,7 @@ async function runFeishuAppSetup(cmd: NotifyCommandArgs, deps: NotifyCommandDeps
 		return;
 	}
 	process.stdout.write(
-		`Feishu app configuration saved and activated. appId=${maskToken(appId)} appSecret=${maskToken(appSecret)} chatId=${chatId ?? "(unset; first authorized sender binds the chat)"} authorizedOpenIds=${authorizedOpenIds ?? "(unset; inbound denied)"} daemon=${activationOutcome ?? "attached"}\n`,
+		`Feishu app configuration saved and activated. appId=${maskToken(appId)} appSecret=${maskToken(appSecret)} chatId=${chatId} authorizedOpenIds=${authorizedOpenIds ?? "(unset; inbound denied)"} daemon=${activationOutcome ?? "attached"}\n`,
 	);
 }
 /**

@@ -80,6 +80,7 @@ export function buildFeishuWebhookTextBody(input: {
 /** Split text into webhook-sized chunks without splitting surrogate pairs. */
 export function splitFeishuText(text: string, maxChars: number = FEISHU_TEXT_CHUNK_CHARS): string[] {
 	const chars = [...text];
+	if (chars.length === 0) return [];
 	if (chars.length <= maxChars) return [text];
 	const chunks: string[] = [];
 	for (let offset = 0; offset < chars.length; offset += maxChars) {
