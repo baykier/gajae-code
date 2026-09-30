@@ -1586,6 +1586,7 @@ const defaultConfig: NotificationConfig = {
 		appSecret: undefined,
 		chatId: undefined,
 		authorizedOpenIds: undefined,
+		streaming: { enabled: true },
 	},
 	verbosity: "lean",
 	sessionScope: "all",

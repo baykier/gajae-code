@@ -68,7 +68,7 @@ function snapshot(overrides: Partial<NotificationSettingsSnapshot> = {}): Notifi
 		redact: false,
 		verbosity: "lean",
 		feishu: {},
-		"feishu-app": {},
+		"feishu-app": { streaming: { enabled: true } },
 		sessionScope: "all",
 		idleTimeoutMs: 60_000,
 		...overrides,

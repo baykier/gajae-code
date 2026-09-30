@@ -137,6 +137,7 @@ export interface NotificationSettingsSnapshot {
 		appSecret?: string;
 		chatId?: string;
 		authorizedOpenIds?: string;
+		streaming: { enabled: boolean };
 	};
 	redact: boolean;
 	verbosity: "lean" | "verbose";
@@ -323,6 +324,11 @@ export function parseNotificationSettingsSnapshot(rawConfig?: unknown): Notifica
 	const feishuAppIssues: ProviderResolutionIssue[] = [];
 	const feishuApp = providerObject(notifications["feishu-app"], "notifications.feishu-app", feishuAppIssues);
 	const feishuAppEnabled = providerEnabled(feishuApp, "notifications.feishu-app.enabled", feishuAppIssues);
+	const feishuAppStreaming = providerObject(
+		feishuApp.streaming,
+		"notifications.feishu-app.streaming",
+		feishuAppIssues,
+	);
 	addMissingRequiredProviderIssues(
 		telegram,
 		["botToken", "chatId"],
@@ -438,6 +444,15 @@ export function parseNotificationSettingsSnapshot(rawConfig?: unknown): Notifica
 			"notifications.feishu-app.authorizedOpenIds",
 			feishuAppIssues,
 		),
+		streaming: {
+			enabled: providerBoolean(
+				feishuAppStreaming,
+				"enabled",
+				"notifications.feishu-app.streaming.enabled",
+				true,
+				feishuAppIssues,
+			),
+		},
 	};
 	const providerIssues: Partial<Record<NotificationProvider, readonly ProviderResolutionIssue[]>> = {
 		...(providerIssuesSnapshot("telegram", telegramIssues) ?? {}),
@@ -513,6 +528,7 @@ export interface NotificationConfig {
 		appSecret?: string;
 		chatId?: string;
 		authorizedOpenIds?: string;
+		streaming: { enabled: boolean };
 	};
 	redact: boolean;
 	verbosity: "lean" | "verbose";
@@ -562,6 +578,7 @@ function notificationConfigFromSnapshot(snapshot: NotificationSettingsSnapshot):
 			appSecret: snapshot["feishu-app"].appSecret,
 			chatId: snapshot["feishu-app"].chatId,
 			authorizedOpenIds: snapshot["feishu-app"].authorizedOpenIds,
+			streaming: snapshot["feishu-app"].streaming,
 		},
 		redact: snapshot.redact,
 		verbosity: snapshot.verbosity,
@@ -785,6 +802,7 @@ export type GenericNotificationStreamSource =
 	| "env_on"
 	| "env_off"
 	| "durable_telegram"
+	| "durable_feishu_app"
 	| "none";
 
 export interface GenericNotificationStreamPolicy {
@@ -822,11 +840,18 @@ export function resolveGenericNotificationStreamPolicy(input: {
 	const override = input.env.GJC_NOTIFICATIONS_STREAM?.trim().toLowerCase();
 	if (override === "1") return { enabled: true, source: "env_on" };
 	if (override === "0" || override === "off" || override === "false") return { enabled: false, source: "env_off" };
-	const durableEnabled =
+	const telegramDurable =
 		input.cfg.streaming.enabled &&
 		isProviderEffectivelyEnabled(input.cfg, "telegram") &&
 		!getCurrentTelegramActivationMarker(input.cfg);
-	return { enabled: durableEnabled, source: durableEnabled ? "durable_telegram" : "none" };
+	// The feishu-app chat daemon renders the same generic stream frames as
+	// Telegram live edits (ephemeral status cards), so live streaming keys off
+	// per-provider enablement: a feishu-app-only deployment streams without any
+	// Telegram configuration.
+	const feishuAppDurable =
+		input.cfg["feishu-app"].streaming.enabled && isProviderEffectivelyEnabled(input.cfg, "feishu-app");
+	const durableSource = telegramDurable ? "durable_telegram" : feishuAppDurable ? "durable_feishu_app" : undefined;
+	return { enabled: durableSource !== undefined, source: durableSource ?? "none" };
 }
 
 export function completionNotifyDisabledByEnv(env: NodeJS.ProcessEnv): boolean {

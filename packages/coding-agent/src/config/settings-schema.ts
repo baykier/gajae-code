@@ -567,6 +567,7 @@ export const SETTINGS_SCHEMA = {
 	"notifications.feishu-app.appSecret": { type: "string", default: undefined },
 	"notifications.feishu-app.chatId": { type: "string", default: undefined },
 	"notifications.feishu-app.authorizedOpenIds": { type: "string", default: undefined },
+	"notifications.feishu-app.streaming.enabled": { type: "boolean", default: true },
 	"notifications.redact": {
 		type: "boolean",
 		default: false,

@@ -95,6 +95,7 @@ const BASE_CFG: NotificationConfig = {
 		appSecret: undefined,
 		chatId: undefined,
 		authorizedOpenIds: undefined,
+		streaming: { enabled: true },
 	},
 	redact: false,
 	verbosity: "lean",
@@ -172,6 +173,10 @@ const MALFORMED_NOTIFICATION_LEAVES: ReadonlyArray<readonly [SettingPath, unknow
 	["notifications.telegram.richDraft.enabled", "invalid"],
 	["notifications.telegram.toolActivity.enabled", "invalid"],
 	["notifications.telegram.streaming.enabled", "invalid"],
+	["notifications.feishu-app.enabled", 42],
+	["notifications.feishu-app.appId", 42],
+	["notifications.feishu-app.chatId", 42],
+	["notifications.feishu-app.streaming.enabled", "invalid"],
 	["notifications.telegram.sound", "invalid"],
 	["notifications.telegram.topics.nameTemplate", 42],
 	["notifications.discord.botToken", 42],
@@ -338,6 +343,7 @@ describe("notifications config", () => {
 				appSecret: undefined,
 				chatId: undefined,
 				authorizedOpenIds: undefined,
+				streaming: { enabled: true },
 			},
 			redact: true,
 			verbosity: "lean",
@@ -584,11 +590,53 @@ describe("notifications config", () => {
 			genericNotificationStreamingEnabled({ cfg: activeTelegram, env: { GJC_NOTIFICATIONS_STREAM: "unknown" } }),
 		).toBe(true);
 	});
+	test("durable feishu-app streaming keys off per-provider enablement", () => {
+		const feishuAppOnly: NotificationConfig = {
+			...BASE_CFG,
+			enabled: true,
+			"feishu-app": {
+				...BASE_CFG["feishu-app"],
+				enabled: true,
+				appId: "cli_a",
+				appSecret: "secret",
+				chatId: "oc_bound",
+				authorizedOpenIds: "ou_alice",
+			},
+		};
+		expect(
+			resolveGenericNotificationStreamPolicy({ cfg: feishuAppOnly, env: {}, genericSessionEnabled: true }),
+		).toEqual({ enabled: true, source: "durable_feishu_app" });
+		// The env kill switch still wins over durable provider enablement.
+		expect(
+			resolveGenericNotificationStreamPolicy({
+				cfg: feishuAppOnly,
+				env: { GJC_NOTIFICATIONS_STREAM: "0" },
+				genericSessionEnabled: true,
+			}).enabled,
+		).toBe(false);
+		// Streaming disabled at the provider level stops the durable lane.
+		expect(
+			resolveGenericNotificationStreamPolicy({
+				cfg: { ...feishuAppOnly, "feishu-app": { ...feishuAppOnly["feishu-app"], streaming: { enabled: false } } },
+				env: {},
+				genericSessionEnabled: true,
+			}).enabled,
+		).toBe(false);
+		// Telegram keeps precedence when both durable lanes qualify.
+		const both: NotificationConfig = { ...feishuAppOnly, ...GLOBAL_CFG };
+		expect(resolveGenericNotificationStreamPolicy({ cfg: both, env: {}, genericSessionEnabled: true }).source).toBe(
+			"durable_telegram",
+		);
+		// Unadmitted sessions never stream.
+		expect(
+			resolveGenericNotificationStreamPolicy({ cfg: feishuAppOnly, env: {}, genericSessionEnabled: false }).source,
+		).toBe("session_not_admitted");
+	});
 	test("full Settings and lightweight daemon share global fail-closed and provider quarantine semantics", () => {
 		for (const [pathName, value] of MALFORMED_NOTIFICATION_LEAVES) {
 			const rawConfig = notificationRawConfigAtPath(pathName, value);
 			const provider = pathName.split(".")[1];
-			if (provider !== "telegram" && provider !== "discord" && provider !== "slack") {
+			if (provider !== "telegram" && provider !== "discord" && provider !== "slack" && provider !== "feishu-app") {
 				expect(() => Settings.isolated({ [pathName]: value }).getNotificationSettingsSnapshot()).toThrow(
 					"gjc_notify_daemon_invalid_configuration",
 				);
@@ -619,7 +667,9 @@ describe("notifications config", () => {
 			{ notifications: { daemon: true } },
 			...MALFORMED_NOTIFICATION_LEAVES.filter(([pathName]) => {
 				const provider = pathName.split(".")[1];
-				return provider !== "telegram" && provider !== "discord" && provider !== "slack";
+				return (
+					provider !== "telegram" && provider !== "discord" && provider !== "slack" && provider !== "feishu-app"
+				);
 			}).map(([pathName, value]) => notificationRawConfigAtPath(pathName, value)),
 		];
 		const providerRawConfigs: unknown[] = [
@@ -633,9 +683,13 @@ describe("notifications config", () => {
 			{ notifications: { telegram: { topics: true } } },
 			{ notifications: { discord: [] } },
 			{ notifications: { slack: [] } },
+			{ notifications: { "feishu-app": [] } },
+			{ notifications: { "feishu-app": { streaming: true } } },
 			...MALFORMED_NOTIFICATION_LEAVES.filter(([pathName]) => {
 				const provider = pathName.split(".")[1];
-				return provider === "telegram" || provider === "discord" || provider === "slack";
+				return (
+					provider === "telegram" || provider === "discord" || provider === "slack" || provider === "feishu-app"
+				);
 			}).map(([pathName, value]) => notificationRawConfigAtPath(pathName, value)),
 		];
 		for (const [index, rawConfig] of globalRawConfigs.entries()) {

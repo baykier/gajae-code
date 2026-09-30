@@ -36,6 +36,7 @@ const BASE_CONFIG: NotificationConfig = {
 		appSecret: undefined,
 		chatId: undefined,
 		authorizedOpenIds: undefined,
+		streaming: { enabled: true },
 	},
 	redact: false,
 	verbosity: "lean",

@@ -56,7 +56,7 @@ function snapshot(overrides: Partial<NotificationSettingsSnapshot> = {}): Notifi
 		slack: {},
 		redact: false,
 		feishu: {},
-		"feishu-app": {},
+		"feishu-app": { streaming: { enabled: true } },
 		verbosity: "lean",
 		sessionScope: "all",
 		idleTimeoutMs: 60_000,
