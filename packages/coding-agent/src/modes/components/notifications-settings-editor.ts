@@ -1837,7 +1837,7 @@ export class NotificationsSettingsEditorComponent implements Component, Focusabl
 				width,
 			),
 		);
-		for (const provider of ["telegram", "discord", "slack"] as const) {
+		for (const provider of ["telegram", "discord", "slack", "feishu", "feishu-app"] as const) {
 			const view = status[provider];
 			const checkedHealth = health?.provider === provider ? statusLabel(health.overall) : "not checked";
 			const test =
