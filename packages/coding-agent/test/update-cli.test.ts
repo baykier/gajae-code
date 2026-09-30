@@ -1502,6 +1502,24 @@ describe("update-cli managed notification recovery", () => {
 		]);
 	});
 
+	it("targets a Feishu-app durable provider during legacy recovery", async () => {
+		const argv: string[][] = [];
+		await runPostUpdateRecoveryForTest(
+			"/older stable/gjc",
+			async args => {
+				argv.push(args);
+				return 0;
+			},
+			async () => false,
+			async () => ["feishu-app"],
+		);
+		expect(argv).toEqual([
+			["/older stable/gjc", "daemon", "stop", "feishu-app", "--force"],
+			["/older stable/gjc", "daemon", "reload", "feishu-app"],
+			["/older stable/gjc", "notify", "recovery"],
+		]);
+	});
+
 	it("fails fast when a legacy recovery stage fails", async () => {
 		const argv: string[][] = [];
 		await expect(
@@ -1545,6 +1563,21 @@ describe("update-cli managed notification recovery", () => {
 				}),
 			),
 		).toBe(true);
+	});
+
+	it("treats a complete feishu-app setup as a managed durable provider", () => {
+		const feishuApp = {
+			"notifications.telegram.enabled": false,
+			"notifications.feishu-app.enabled": true,
+			"notifications.feishu-app.appId": "cli_test",
+			"notifications.feishu-app.appSecret": "feishu-secret",
+			"notifications.feishu-app.chatId": "oc_test",
+			"notifications.feishu-app.authorizedOpenIds": "ou_test",
+		};
+		expect(hasManagedNotifySetup(configuredSettings(feishuApp))).toBe(true);
+		expect(
+			hasManagedNotifySetup(configuredSettings({ ...feishuApp, "notifications.feishu-app.enabled": false })),
+		).toBe(false);
 	});
 
 	it.each(["binary", "bun", "npm"] as const)("runs the verified %s lifecycle in exact order", async method => {

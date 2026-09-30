@@ -20,7 +20,7 @@ import { isUpdateChannel, UPDATE_CHANNELS, type UpdateChannel } from "../config/
 import type { DaemonKind } from "../daemon/control-types";
 import { installDefaultGjcDefinitions } from "../defaults/gjc-defaults";
 import { theme } from "../modes/theme/theme";
-import { getNotificationConfig, type NotificationProvider, resolveNotificationProvider } from "../sdk/bus/config";
+import { getNotificationConfig, resolveNotificationProvider } from "../sdk/bus/config";
 import type { TelemetryDetails, TelemetryEventName } from "../telemetry";
 import { recordTelemetryEvent } from "../telemetry";
 import { runDaemonCommand } from "./daemon-cli";
@@ -1319,7 +1319,7 @@ export interface UpdateCommandDependencies {
 
 export type PostUpdateRecoverySpawn = (argv: string[]) => Promise<number>;
 export type PostUpdateRecoverySupportCheck = (runtimePath: string) => Promise<boolean>;
-export type LegacyRecoveryDaemonKinds = () => Promise<NotificationProvider[]>;
+export type LegacyRecoveryDaemonKinds = () => Promise<DaemonKind[]>;
 
 async function offerCommunityAppAfterUpdate(deps: UpdateCommandDependencies): Promise<void> {
 	const platform = deps.platform ?? process.platform;
@@ -1350,7 +1350,7 @@ export function hasManagedNotifySetup(settings: Settings): boolean {
 
 function managedNotifyDaemonKinds(settings: Settings): DaemonKind[] {
 	const config = getNotificationConfig(settings);
-	return (["telegram", "discord", "slack"] as const).filter(provider => {
+	return (["telegram", "discord", "slack", "feishu-app"] as const).filter(provider => {
 		const resolution = resolveNotificationProvider(config, provider);
 		return resolution.configured && !resolution.quarantined && resolution.desiredEnabled;
 	});
