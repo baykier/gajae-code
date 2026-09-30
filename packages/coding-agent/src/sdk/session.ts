@@ -648,7 +648,10 @@ export interface CreateAgentSessionOptions {
 	/** Whether this host mode can own the root SDK endpoint. Default: true. */
 	sdkHostModeSupported?: boolean;
 	/** Override configured Discord/Slack daemon readiness, primarily for embedded hosts and deterministic tests. */
-	ensureNotificationProviderDaemon?: (provider: "discord" | "slack", settings: Settings) => Promise<unknown>;
+	ensureNotificationProviderDaemon?: (
+		provider: "discord" | "slack" | "feishu-app",
+		settings: Settings,
+	) => Promise<unknown>;
 
 	/**
 	 * Opt-in OpenTelemetry instrumentation forwarded to the underlying Agent.

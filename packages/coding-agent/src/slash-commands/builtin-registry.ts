@@ -676,7 +676,7 @@ function buildChangelogCommandOutput(showFull: boolean): string {
 type NotifyServiceArgs = { provider?: NotificationProvider; probe: boolean; message?: string } | { error: string };
 
 function isNotificationProvider(value: string): value is NotificationProvider {
-	return value === "telegram" || value === "discord" || value === "slack";
+	return value === "telegram" || value === "discord" || value === "slack" || value === "feishu";
 }
 
 function parseNotifyServiceArgs(input: string, allowMessage: boolean): NotifyServiceArgs {
@@ -694,7 +694,7 @@ function parseNotifyServiceArgs(input: string, allowMessage: boolean): NotifySer
 		if (token === "--provider" || token.startsWith("--provider=")) {
 			const value = token === "--provider" ? tokens[++index] : token.slice("--provider=".length);
 			if (!value || !isNotificationProvider(value)) {
-				return { error: "--provider must be telegram, discord, or slack." };
+				return { error: "--provider must be telegram, discord, slack, or feishu." };
 			}
 			if (provider && provider !== value) return { error: "Conflicting notification providers were supplied." };
 			provider = value;
@@ -800,7 +800,10 @@ const BUILTIN_SLASH_COMMAND_REGISTRY: ReadonlyArray<SlashCommandSpec> = [
 				case "health": {
 					const parsed = parseNotifyServiceArgs(rest, false);
 					if ("error" in parsed) {
-						return usage(`Usage: /notify health [telegram|discord|slack] [--probe]\n${parsed.error}`, runtime);
+						return usage(
+							`Usage: /notify health [telegram|discord|slack|feishu] [--probe]\n${parsed.error}`,
+							runtime,
+						);
 					}
 					const { checkNotificationHealth, formatNotificationHealthReport } = await import(
 						"../sdk/bus/notification-service"
@@ -818,7 +821,7 @@ const BUILTIN_SLASH_COMMAND_REGISTRY: ReadonlyArray<SlashCommandSpec> = [
 					const parsed = parseNotifyServiceArgs(rest, true);
 					if ("error" in parsed) {
 						return usage(
-							`Usage: /notify test [telegram|discord|slack|--provider provider] [message]\n${parsed.error}`,
+							`Usage: /notify test [telegram|discord|slack|feishu|--provider provider] [message]\n${parsed.error}`,
 							runtime,
 						);
 					}
@@ -836,10 +839,12 @@ const BUILTIN_SLASH_COMMAND_REGISTRY: ReadonlyArray<SlashCommandSpec> = [
 										? await new (await import("../sdk/bus/telegram-daemon-control")).TelegramDaemonController(
 												runtime.settings,
 											).status()
-										: await new (await import("../sdk/bus/chat-daemon-control")).ChatDaemonController(
-												runtime.settings,
-												provider,
-											).status();
+										: provider === "feishu"
+											? { health: "running" as const }
+											: await new (await import("../sdk/bus/chat-daemon-control")).ChatDaemonController(
+													runtime.settings,
+													provider,
+												).status();
 								return status.health === "running" ? "ready" : "inactive";
 							},
 						},

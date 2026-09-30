@@ -1,5 +1,5 @@
 /**
- * Configure Telegram, Discord, or Slack notifications.
+ * Configure Telegram, Discord, Slack, Feishu webhook, or Feishu app notifications.
  */
 import { Args, Command, Flags } from "@gajae-code/utils/cli";
 import {
@@ -7,6 +7,7 @@ import {
 	assertStrictBindThreadInvocation,
 	type NotifyAction,
 	type NotifyCommandArgs,
+	notifySetupProvider,
 	runNotifyCliCommand,
 } from "../cli/notify-cli";
 import { initTheme } from "../modes/theme/theme";
@@ -23,7 +24,7 @@ const ACTIONS: NotifyAction[] = [
 ];
 
 export default class Notify extends Command {
-	static description = "Configure Telegram, Discord, or Slack notifications";
+	static description = "Configure Telegram, Discord, Slack, Feishu webhook, or Feishu app notifications";
 
 	static args = {
 		action: Args.string({
@@ -54,10 +55,20 @@ export default class Notify extends Command {
 		"slack-authorized-user-id": Flags.string({
 			description: "Slack user id authorized for inbound replies and commands",
 		}),
+		"feishu-webhook-url": Flags.string({
+			description: "Feishu custom-bot webhook URL (non-interactive Feishu setup)",
+		}),
+		"feishu-secret": Flags.string({ description: "Feishu webhook signing secret (optional)" }),
+		"feishu-app-id": Flags.string({ description: "Feishu app id (non-interactive Feishu app setup)" }),
+		"feishu-app-secret": Flags.string({ description: "Feishu app secret (non-interactive Feishu app setup)" }),
+		"feishu-app-chat-id": Flags.string({ description: "Feishu chat id bound for inbound and outbound" }),
+		"feishu-app-authorized-open-ids": Flags.string({
+			description: "Comma-separated Feishu open_id allowlist for inbound replies and commands",
+		}),
 		redact: Flags.boolean({ description: "Enable redaction of remote notification content" }),
 		provider: Flags.string({
-			description: "notify health/test: select telegram, discord, or slack",
-			options: ["telegram", "discord", "slack"],
+			description: "notify health/test: select telegram, discord, slack, feishu, or feishu-app",
+			options: ["telegram", "discord", "slack", "feishu", "feishu-app"],
 		}),
 		probe: Flags.boolean({ description: "notify health: run the selected provider's REST diagnostic" }),
 		message: Flags.string({ description: "notify test: custom message body" }),
@@ -76,56 +87,7 @@ export default class Notify extends Command {
 			process.exit(1);
 		}
 		const extra = Array.isArray(args.extra) ? args.extra : args.extra ? [args.extra] : [];
-		const flagRec = flags as Record<string, unknown>;
-		const ownerId = flagRec["owner-id"] as string | undefined;
-		const agentDir = flagRec["agent-dir"] as string | undefined;
-		const rawArgs = [
-			...(flags.smoke ? ["--smoke"] : []),
-			...(ownerId ? ["--owner-id", ownerId] : []),
-			...(agentDir ? ["--agent-dir", agentDir] : []),
-			...extra,
-		];
-		const positionalProvider = action === "setup" ? extra[0] : undefined;
-		if (
-			positionalProvider !== undefined &&
-			positionalProvider !== "telegram" &&
-			positionalProvider !== "discord" &&
-			positionalProvider !== "slack"
-		) {
-			throw new Error(`Unknown notification provider: ${positionalProvider}`);
-		}
-		const providerFlag = flagRec.provider as string | undefined;
-		if (providerFlag && action !== "health" && action !== "test") {
-			throw new Error("--provider is valid only for notify health and notify test.");
-		}
-		if (action !== "setup" && action !== "daemon-internal" && extra.length > 0) {
-			throw new Error(`Unexpected notify arguments: ${extra.join(" ")}`);
-		}
-		const provider = providerFlag ?? positionalProvider;
-
-		const cmd: NotifyCommandArgs = {
-			action: action as NotifyAction,
-			smoke: flags.smoke,
-			rawArgs,
-			provider: provider === "telegram" || provider === "discord" || provider === "slack" ? provider : undefined,
-			token: flags.token as string | undefined,
-			chatId: (flags as Record<string, unknown>)["chat-id"] as string | undefined,
-			discordBotToken: flagRec["discord-bot-token"] as string | undefined,
-			discordApplicationId: flagRec["discord-application-id"] as string | undefined,
-			discordGuildId: flagRec["discord-guild-id"] as string | undefined,
-			discordParentChannelId: flagRec["discord-parent-channel-id"] as string | undefined,
-			slackBotToken: flagRec["slack-bot-token"] as string | undefined,
-			slackAppToken: flagRec["slack-app-token"] as string | undefined,
-			slackWorkspaceId: flagRec["slack-workspace-id"] as string | undefined,
-			slackChannelId: flagRec["slack-channel-id"] as string | undefined,
-			slackAuthorizedUserId: flagRec["slack-authorized-user-id"] as string | undefined,
-			redact: Boolean(flags.redact),
-			probe: Boolean(flags.probe),
-			message: flags.message as string | undefined,
-			sessionId: flagRec["session-id"] as string | undefined,
-			threadTs: flagRec["thread-ts"] as string | undefined,
-		};
-
+		const cmd = notifyCommandArgsFromInvocation({ action, flags: flags as Record<string, unknown>, extra });
 		// `bind-thread` and `activate-thread` have no positional or internal form:
 		// any extra argument or unrelated notify flag is rejected here rather than
 		// silently ignored.
@@ -134,4 +96,66 @@ export default class Notify extends Command {
 		if (action !== "daemon-internal") await initTheme();
 		await runNotifyCliCommand(cmd);
 	}
+}
+
+/**
+ * Pure mapping from a parsed CLI invocation to the NotifyCommandArgs the
+ * notify-cli implementation consumes. Every new provider flag must be both
+ * declared in Notify.flags and mapped here, or the value is silently dropped.
+ */
+export function notifyCommandArgsFromInvocation(input: {
+	action: string;
+	flags: Record<string, unknown>;
+	extra: string[];
+}): NotifyCommandArgs {
+	const { action, flags, extra } = input;
+	const flagRec = flags;
+	const ownerId = flagRec["owner-id"] as string | undefined;
+	const agentDir = flagRec["agent-dir"] as string | undefined;
+	const rawArgs = [
+		...(flags.smoke ? ["--smoke"] : []),
+		...(ownerId ? ["--owner-id", ownerId] : []),
+		...(agentDir ? ["--agent-dir", agentDir] : []),
+		...extra,
+	];
+	const positionalProvider = action === "setup" ? extra[0] : undefined;
+	if (positionalProvider !== undefined && notifySetupProvider(positionalProvider) === undefined) {
+		throw new Error(`Unknown notification provider: ${positionalProvider}`);
+	}
+	const providerFlag = flagRec.provider as string | undefined;
+	if (providerFlag && action !== "health" && action !== "test") {
+		throw new Error("--provider is valid only for notify health and notify test.");
+	}
+	if (action !== "setup" && action !== "daemon-internal" && extra.length > 0) {
+		throw new Error(`Unexpected notify arguments: ${extra.join(" ")}`);
+	}
+	const provider = providerFlag ?? positionalProvider;
+	return {
+		action: action as NotifyAction,
+		smoke: flags.smoke === true,
+		rawArgs,
+		provider: notifySetupProvider(provider),
+		token: flags.token as string | undefined,
+		chatId: flagRec["chat-id"] as string | undefined,
+		discordBotToken: flagRec["discord-bot-token"] as string | undefined,
+		discordApplicationId: flagRec["discord-application-id"] as string | undefined,
+		discordGuildId: flagRec["discord-guild-id"] as string | undefined,
+		discordParentChannelId: flagRec["discord-parent-channel-id"] as string | undefined,
+		slackBotToken: flagRec["slack-bot-token"] as string | undefined,
+		slackAppToken: flagRec["slack-app-token"] as string | undefined,
+		slackWorkspaceId: flagRec["slack-workspace-id"] as string | undefined,
+		slackChannelId: flagRec["slack-channel-id"] as string | undefined,
+		slackAuthorizedUserId: flagRec["slack-authorized-user-id"] as string | undefined,
+		feishuWebhookUrl: flagRec["feishu-webhook-url"] as string | undefined,
+		feishuSecret: flagRec["feishu-secret"] as string | undefined,
+		feishuAppId: flagRec["feishu-app-id"] as string | undefined,
+		feishuAppSecret: flagRec["feishu-app-secret"] as string | undefined,
+		feishuAppChatId: flagRec["feishu-app-chat-id"] as string | undefined,
+		feishuAppAuthorizedOpenIds: flagRec["feishu-app-authorized-open-ids"] as string | undefined,
+		redact: flags.redact === true,
+		probe: flags.probe === true,
+		message: flags.message as string | undefined,
+		sessionId: flagRec["session-id"] as string | undefined,
+		threadTs: flagRec["thread-ts"] as string | undefined,
+	};
 }

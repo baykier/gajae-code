@@ -7,7 +7,7 @@ import type { SessionRouterDeps } from "../router";
 
 import { type SessionAttachment, SessionRouter, SessionRouterError, type SessionRouterFrame } from "../router";
 
-import { createDiscordAdapter, createSlackAdapter } from "./chat-adapters";
+import { createDiscordAdapter, createFeishuAppAdapter, createSlackAdapter } from "./chat-adapters";
 import {
 	type ChatOperationRequest,
 	type ChatTransport,
@@ -18,7 +18,6 @@ import type { ChatDaemonCommandBindInput, ChatDaemonCommandOutcome } from "./cha
 import type { ChatDaemonKind } from "./chat-daemon-control";
 import { isControlPlaneFrameType } from "./control-plane-frames";
 import { DiscordNotificationDaemon } from "./discord-daemon";
-
 import { DiscordLiveProvider } from "./discord-live-provider";
 import type { DiscordProvider } from "./discord-provider";
 import {
@@ -28,6 +27,8 @@ import {
 	doctorDaemonOccupancySettled,
 } from "./doctor-daemon-restart";
 import { type NotificationEvent, NotificationPresentationEngine } from "./engine";
+import { FeishuAppNotificationDaemon } from "./feishu-app-daemon";
+import { FeishuAppLiveProvider, type FeishuAppProviderClient } from "./feishu-app-provider";
 import { SlackNotificationDaemon } from "./slack-daemon";
 import { SlackLiveProvider } from "./slack-live-provider";
 import { SlackProvider, type SlackProviderClient } from "./slack-provider";
@@ -38,6 +39,7 @@ export interface ChatDaemonRuntimeConfig {
 	notifications: {
 		discord?: { botToken: string; applicationId: string; guildId: string; parentChannelId: string };
 		slack?: { botToken: string; appToken: string; workspaceId: string; channelId: string; authorizedUserId?: string };
+		"feishu-app"?: { appId: string; appSecret: string; chatId: string; authorizedOpenIds: string };
 	};
 	presentation?: { redact: boolean; verbosity: "lean" | "verbose" };
 }
@@ -80,6 +82,9 @@ export interface ChatDaemonRuntimeDeps {
 	createSlackProvider?: (
 		config: NonNullable<ChatDaemonRuntimeConfig["notifications"]["slack"]>,
 	) => SlackProviderClient;
+	createFeishuAppProvider?: (
+		config: NonNullable<ChatDaemonRuntimeConfig["notifications"]["feishu-app"]>,
+	) => FeishuAppProviderClient;
 	routerDeps?: SessionRouterDeps;
 }
 
@@ -303,6 +308,7 @@ export class ChatDaemonRuntime {
 	#stopping = false;
 	#discord: DiscordNotificationDaemon | undefined;
 	#slack: SlackNotificationDaemon | undefined;
+	#feishuApp: FeishuAppNotificationDaemon | undefined;
 	#presentation: NotificationPresentationEngine | undefined;
 	#transportHealthy: (() => boolean) | undefined;
 	#doctorPrepared = false;
@@ -382,9 +388,13 @@ export class ChatDaemonRuntime {
 				? this.#discord?.restartBlocked()
 					? this.#discord
 					: undefined
-				: this.#slack?.restartBlocked()
-					? this.#slack
-					: undefined;
+				: this.input.kind === "slack"
+					? this.#slack?.restartBlocked()
+						? this.#slack
+						: undefined
+					: this.#feishuApp?.restartBlocked()
+						? this.#feishuApp
+						: undefined;
 		if (retainedProvider) {
 			try {
 				await this.#router.start();
@@ -422,7 +432,7 @@ export class ChatDaemonRuntime {
 				onCommand: async (sessionId, content, attachment, idempotencyKey) =>
 					await this.#runChatCommand("discord", sessionId, content, attachment, idempotencyKey),
 			});
-		} else {
+		} else if (this.input.kind === "slack") {
 			const config = this.input.config.notifications.slack;
 			if (!config) throw new Error("Slack chat daemon provider configuration is unavailable.");
 			const provider = (
@@ -456,11 +466,39 @@ export class ChatDaemonRuntime {
 						dispatchFence,
 					),
 			});
+		} else {
+			const config = this.input.config.notifications["feishu-app"];
+			if (!config) throw new Error("Feishu app chat daemon provider configuration is unavailable.");
+			const provider = (
+				this.deps.createFeishuAppProvider ??
+				((value: NonNullable<ChatDaemonRuntimeConfig["notifications"]["feishu-app"]>) =>
+					new FeishuAppLiveProvider(value))
+			)(config);
+			this.#transportHealthy = () => this.#router.isReady() && (provider.transportHealthy ?? true);
+			this.#presentation = new NotificationPresentationEngine([createFeishuAppAdapter()], {
+				redact: this.input.config.presentation?.redact ?? true,
+			});
+			const authorizedOpenIds = new Set(
+				config.authorizedOpenIds
+					.split(",")
+					.map(entry => entry.trim())
+					.filter(entry => entry.length > 0),
+			);
+			this.#feishuApp = new FeishuAppNotificationDaemon({
+				provider,
+				authorizedOpenIds,
+				resolveAttachment: sessionId => this.#router.attachment(sessionId),
+				onCommand: async (sessionId, content, attachment, idempotencyKey) =>
+					await this.#runChatCommand("feishu-app", sessionId, content, attachment, idempotencyKey),
+				onFreeForm: async (sessionId, content, attachment, idempotencyKey) =>
+					await this.#runFreeFormMessage(sessionId, content, attachment, idempotencyKey),
+			});
 		}
 		try {
 			await this.#router.start();
 			if (this.#discord) await this.#discord.start();
 			if (this.#slack) await this.#slack.start();
+			if (this.#feishuApp) await this.#feishuApp.start();
 			replayReady.resolve();
 		} catch (error) {
 			replayReady.reject(error);
@@ -538,12 +576,18 @@ export class ChatDaemonRuntime {
 			: [{ status: "rejected" as const, reason: new Error("Provider cleanup exceeded shutdown drain.") }];
 		if (!cleanupSettled)
 			logger.warn("SDK chat daemon cleanup exceeded the shutdown drain; provider stop will invalidate it.");
-		const providerResults = await Promise.allSettled([this.#discord?.stop(), this.#slack?.stop()]);
+		const providerResults = await Promise.allSettled([
+			this.#discord?.stop(),
+			this.#slack?.stop(),
+			this.#feishuApp?.stop(),
+		]);
 		const discordRestartBlocked = this.#discord?.restartBlocked() ?? false;
 		const slackRestartBlocked = this.#slack?.restartBlocked() ?? false;
+		const feishuAppRestartBlocked = this.#feishuApp?.restartBlocked() ?? false;
 		if (!discordRestartBlocked) this.#discord = undefined;
 		if (!slackRestartBlocked) this.#slack = undefined;
-		if (!discordRestartBlocked && !slackRestartBlocked) {
+		if (!feishuAppRestartBlocked) this.#feishuApp = undefined;
+		if (!discordRestartBlocked && !slackRestartBlocked && !feishuAppRestartBlocked) {
 			this.#presentation = undefined;
 			this.#transportHealthy = undefined;
 		}
@@ -606,6 +650,7 @@ export class ChatDaemonRuntime {
 		}
 		const discord = this.#discord;
 		const slack = this.#slack;
+		const feishuApp = this.#feishuApp;
 		const barrier = (async () => {
 			const retirement = this.#retirementWork.get(attachment.sessionId);
 			let retirementFailure: unknown;
@@ -619,11 +664,12 @@ export class ChatDaemonRuntime {
 			}
 			const cleanup = this.#cleanupWork.get(attachment.sessionId);
 			if (cleanup) await cleanup.catch(error => logger.warn(`SDK cleanup retry pending: ${String(error)}`));
-			const [discordRecovered, slackRecovered] = await Promise.all([
+			const [discordRecovered, slackRecovered, feishuAppRecovered] = await Promise.all([
 				discord?.recoverCleanup(attachment.sessionId, attachment.generation, attachment.authorityId) ?? true,
 				slack?.recoverCleanup(attachment.sessionId, attachment.generation, attachment.authorityId) ?? true,
+				feishuApp?.recoverCleanup(attachment.sessionId, attachment.generation, attachment.authorityId) ?? true,
 			]);
-			if (!discordRecovered || !slackRecovered)
+			if (!discordRecovered || !slackRecovered || !feishuAppRecovered)
 				throw new Error("successor_attachment_blocked_until_retirement_is_verified");
 			if (cleanup !== undefined && this.#cleanupWork.get(attachment.sessionId) === cleanup) {
 				this.#cleanupWork.delete(attachment.sessionId);
@@ -668,6 +714,7 @@ export class ChatDaemonRuntime {
 		const sessionId = attachment.sessionId;
 		const discord = this.#discord;
 		const slack = this.#slack;
+		const feishuApp = this.#feishuApp;
 		const previous = this.#retirementWork.get(sessionId);
 		const work = (
 			previous
@@ -681,6 +728,7 @@ export class ChatDaemonRuntime {
 			// waiter settles, even when takeover overlaps worker shutdown.
 			await discord?.retireAttachment(sessionId, attachment.generation);
 			await slack?.retireAttachment(sessionId, attachment.generation);
+			await feishuApp?.retireAttachment(sessionId, attachment.generation);
 		});
 		this.#retirementWork.set(sessionId, work);
 		void work.then(
@@ -729,6 +777,7 @@ export class ChatDaemonRuntime {
 			await Promise.all([
 				this.#discord?.resolveAction(sessionId, notification.id),
 				this.#slack?.resolveAction(sessionId, notification.id),
+				this.#feishuApp?.resolveAction(sessionId, notification.id),
 			]);
 			return;
 		}
@@ -770,6 +819,18 @@ export class ChatDaemonRuntime {
 					publicationId,
 				),
 			);
+		if (this.#feishuApp)
+			await this.#trackOutbound(
+				this.#feishuApp.notify({
+					sessionId,
+					endpointGeneration: attachment.generation,
+					content,
+					...(publicationId === undefined ? {} : { publicationId }),
+					...(notification.type === "action_needed" && notification.kind === "ask"
+						? { actionId: notification.id, options: notification.options }
+						: {}),
+				}),
+			);
 	}
 
 	#trackCleanup(attachment: SessionAttachment): Promise<void> {
@@ -801,6 +862,7 @@ export class ChatDaemonRuntime {
 		const slack = this.#slack;
 		await discord?.close(attachment.sessionId, attachment.generation);
 		await slack?.close(attachment.sessionId, undefined, attachment.generation);
+		await this.#feishuApp?.close(attachment.sessionId, attachment.generation);
 	}
 
 	async #resume(
@@ -823,6 +885,8 @@ export class ChatDaemonRuntime {
 			);
 		}
 		if (this.#slack) await this.#trackOutbound(this.#slack.resume(sessionId, content, generation, publicationId));
+		if (this.#feishuApp)
+			await this.#trackOutbound(this.#feishuApp.resume(sessionId, content, generation, publicationId));
 	}
 
 	async #runChatCommand(
@@ -850,6 +914,63 @@ export class ChatDaemonRuntime {
 		);
 	}
 
+	async #runFreeFormMessage(
+		sessionId: string,
+		content: string,
+		expectedAttachment: SessionAttachment,
+		idempotencyKey: string = randomUUID(),
+	): Promise<boolean> {
+		// Fence BEFORE any admitted async work, matching the /sdk command path.
+		if (this.#doctorPrepared) throw new ChatDeliveryError("pre_send");
+		return await this.#trackInbound(
+			this.#runFreeFormMessageBody(sessionId, content, expectedAttachment, idempotencyKey),
+		);
+	}
+
+	async #runFreeFormMessageBody(
+		sessionId: string,
+		content: string,
+		expectedAttachment: SessionAttachment,
+		idempotencyKey: string,
+	): Promise<boolean> {
+		if (!expectedAttachment.isCurrent()) throw new ChatDeliveryError("pre_send");
+		// turn.prompt is durable and explicitly acknowledged, unlike the raw
+		// user_message WS injection whose token-authorized frame can vanish
+		// inside hosts whose notification runtime is not wired to this
+		// endpoint. A prompt submitted mid-run queues for the next idle
+		// boundary; the daemon surfaces the acceptance receipt to the chat.
+		const response = await this.#router.request(
+			sessionId,
+			{
+				type: "control_request",
+				operation: "turn.prompt",
+				input: { text: content, clientRef: idempotencyKey },
+				confirm: true,
+				idempotencyKey,
+			},
+			expectedAttachment.generation,
+			expectedAttachment,
+		);
+		if (response.ok === false) {
+			const failure = response.error;
+			const message =
+				typeof failure === "object" &&
+				failure !== null &&
+				typeof (failure as { message?: unknown }).message === "string"
+					? (failure as { message: string }).message
+					: "turn.prompt rejected";
+			logger.warn(`chat free-form turn.prompt rejected: ${message}`);
+			return false;
+		}
+		const result = response.result;
+		const receipt =
+			typeof result === "object" && result !== null ? (result as { receipt?: unknown }).receipt : undefined;
+		const accepted =
+			typeof receipt === "object" && receipt !== null && (receipt as { accepted?: unknown }).accepted === true;
+		logger.info(`chat free-form turn.prompt accepted=${accepted}`);
+		return accepted;
+	}
+
 	async #runChatCommandBody(
 		transport: ChatTransport,
 		sessionId: string,
@@ -860,17 +981,25 @@ export class ChatDaemonRuntime {
 		dispatchFence: (<T>(dispatch: () => Promise<T>) => Promise<T>) | undefined,
 	): Promise<boolean> {
 		const match = /^\/sdk\s+(control|query|global)\s+([^\s]+)(?:\s+(.+))?\s*$/.exec(content);
-		if (!match) return false;
+		if (!match) {
+			logger.info("chat /sdk command text did not match the '<kind> <operation> [json]' grammar; ignored");
+			await this.#postCommandUsageHint(transport, sessionId);
+			return false;
+		}
 		const kind = match[1] as "control" | "query" | "global";
 		let input: unknown = {};
 		if (match[3]) {
 			try {
 				input = JSON.parse(match[3]);
 			} catch {
+				await this.#postCommandUsageHint(transport, sessionId);
 				return false;
 			}
 		}
-		if (!input || typeof input !== "object" || Array.isArray(input)) return false;
+		if (!input || typeof input !== "object" || Array.isArray(input)) {
+			await this.#postCommandUsageHint(transport, sessionId);
+			return false;
+		}
 		const operation = match[2]!;
 		let outcome: { ok: true; result: unknown } | { ok: false; error: { code: string; message: string } };
 		try {
@@ -909,6 +1038,7 @@ export class ChatDaemonRuntime {
 			};
 		}
 		await this.#postCommandOutcome(transport, sessionId, { kind, operation }, outcome);
+		logger.info(`chat /sdk command ${kind} ${operation} outcome=${outcome.ok ? "ok" : outcome.error.code}`);
 		return outcome.ok;
 	}
 
@@ -933,6 +1063,14 @@ export class ChatDaemonRuntime {
 		}
 	}
 
+	async #postCommandUsageHint(transport: ChatTransport, sessionId: string): Promise<void> {
+		const usage =
+			"/sdk command not recognized. Usage: /sdk <control|query|global> <operation> [json] — example: /sdk query session.metadata";
+		if (transport === "discord") await this.#discord?.postCommandResult(sessionId, usage);
+		else if (transport === "slack") await this.#slack?.postCommandResult(sessionId, usage);
+		else await this.#feishuApp?.postCommandResult(sessionId, usage);
+	}
+
 	async #postCommandOutcome(
 		transport: ChatTransport,
 		sessionId: string,
@@ -941,7 +1079,8 @@ export class ChatDaemonRuntime {
 	): Promise<void> {
 		const content = JSON.stringify(projectChatCommandOutcome(request, outcome));
 		if (transport === "discord") await this.#discord?.postCommandResult(sessionId, content);
-		else await this.#slack?.postCommandResult(sessionId, content);
+		else if (transport === "slack") await this.#slack?.postCommandResult(sessionId, content);
+		else await this.#feishuApp?.postCommandResult(sessionId, content);
 	}
 
 	#notificationEvent(sessionId: string, frame: Record<string, unknown>): NotificationEvent {

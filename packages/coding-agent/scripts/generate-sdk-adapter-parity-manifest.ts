@@ -14,6 +14,7 @@ const adapterTests: Record<Adapter, string[]> = {
 	telegram: [chatDispositionFile],
 	discord: [chatDispositionFile],
 	slack: [chatDispositionFile],
+	"feishu-app": [chatDispositionFile],
 	mcp: [
 		"packages/coding-agent/test/sdk-mcp-adapter.test.ts",
 		"packages/coding-agent/test/sdk-mcp-entrypoint-e2e.test.ts",
@@ -37,12 +38,12 @@ const commandFiles = [
 ].sort();
 const commands: Manifest["commands"] = commandFiles.flatMap(file =>
 	file === dispositionChatFile
-		? [{ argv: ["bun", "test", file, "--test-name-pattern", "^AD-(T|D|S)-"] }]
+		? [{ argv: ["bun", "test", file, "--test-name-pattern", "^AD-(T|D|S|F)-"] }]
 		: [{ argv: ["bun", "test", file] }],
 );
 const required = [...commandFiles];
 const excluded: Manifest["excluded"] = [];
-const adapters = ["telegram", "discord", "slack", "mcp", "acp", "daemonCli"] as const;
+const adapters = ["telegram", "discord", "slack", "feishu-app", "mcp", "acp", "daemonCli"] as const;
 
 function expectedOutcome(disposition: AdapterDisposition, sdkId?: string): ManifestAdapterRow["expected"] {
 	if (sdkId === "session.reconcile_uncertain") return "rejected_before_send";
@@ -60,11 +61,13 @@ function adapterTestPrefix(adapter: Adapter): string {
 			? "D"
 			: adapter === "slack"
 				? "S"
-				: adapter === "daemonCli"
-					? "L"
-					: adapter === "mcp"
-						? "M"
-						: "A";
+				: adapter === "feishu-app"
+					? "F"
+					: adapter === "daemonCli"
+						? "L"
+						: adapter === "mcp"
+							? "M"
+							: "A";
 }
 function dispositionFileFor(adapter: Adapter): string {
 	if (adapter === "mcp") return mcpDispositionFile;
@@ -145,7 +148,11 @@ async function checkCoverage(manifest: Manifest): Promise<void> {
 		// The disposition suite deliberately generates names from registry IDs. This source check
 		// confirms its name template and the concrete row ID are both present in the test source.
 		// Chat adapters use chatPrefix; machine adapters use adapterPrefix (issue #4475 split).
-		const isChat = row.adapter === "telegram" || row.adapter === "discord" || row.adapter === "slack";
+		const isChat =
+			row.adapter === "telegram" ||
+			row.adapter === "discord" ||
+			row.adapter === "slack" ||
+			row.adapter === "feishu-app";
 		const nameTemplate = isChat
 			? "AD-$" + "{chatPrefix[adapter]}-$" + "{operation.id}"
 			: "AD-$" + "{adapterPrefix[adapter]}-$" + "{operation.id}";
@@ -154,7 +161,7 @@ async function checkCoverage(manifest: Manifest): Promise<void> {
 		if (!OPERATIONS.some(operation => row.sdkId === operation.sdkId))
 			throw new Error(`${row.adapterTestId} references an unknown SDK ID.`);
 	}
-	if (manifest.excluded.length !== 0) throw new Error("SDK adapter parity manifest must include all six adapters.");
+	if (manifest.excluded.length !== 0) throw new Error("SDK adapter parity manifest must include all seven adapters.");
 }
 
 async function checkManifest(expected: Manifest): Promise<void> {

@@ -6,7 +6,7 @@
  * a richer registry is intentionally deferred until a second kind exists.
  */
 
-export type DaemonKind = "telegram" | "discord" | "slack";
+export type DaemonKind = "telegram" | "discord" | "slack" | "feishu-app";
 
 /** `reload` remains the controller result verb; `restart` is the CLI canonical action. */
 export type DaemonAction = "list" | "status" | "stop" | "restart" | "reload";

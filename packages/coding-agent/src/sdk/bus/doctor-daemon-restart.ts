@@ -1,4 +1,4 @@
-export type DoctorDaemonOwner = "telegram" | "discord" | "slack";
+export type DoctorDaemonOwner = "telegram" | "discord" | "slack" | "feishu-app";
 
 export interface DoctorDaemonIdentity {
 	owner: DoctorDaemonOwner;

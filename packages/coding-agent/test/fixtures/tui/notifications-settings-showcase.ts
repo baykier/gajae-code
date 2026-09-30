@@ -630,6 +630,8 @@ function fixedEditorState(
 		},
 		discord: unconfiguredAdapter(),
 		slack: unconfiguredAdapter(),
+		feishu: unconfiguredAdapter(),
+		"feishu-app": unconfiguredAdapter(),
 	};
 	let session: NotificationSessionStatus = {
 		eligible: true,

@@ -19,7 +19,7 @@ export interface NotificationAdapterPayload {
 }
 
 export interface NotificationPresentationAdapter {
-	readonly kind: "telegram" | "discord" | "slack";
+	readonly kind: "telegram" | "discord" | "slack" | "feishu-app";
 	render(event: NotificationEvent): NotificationAdapterPayload[];
 	mapInbound(input: unknown): NotificationReplyRoute | undefined;
 }

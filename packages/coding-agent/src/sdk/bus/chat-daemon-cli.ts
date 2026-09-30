@@ -21,6 +21,7 @@ import {
 import { type ChatDaemonRuntimeConfig, ChatDaemonRuntime as DefaultChatDaemonRuntime } from "./chat-daemon-runtime";
 import {
 	isDiscordComplete,
+	isFeishuAppComplete,
 	isSlackComplete,
 	loadNotificationConfigFile,
 	notificationConfigFromFile,
@@ -46,7 +47,7 @@ export interface ChatDaemonRuntimeHandle {
 	doctorRestartReady?(): boolean;
 	doctorRestartStatus?(
 		identity: {
-			owner: "discord" | "slack";
+			owner: "discord" | "slack" | "feishu-app";
 			ownerId: string;
 			generation: number;
 			incarnation: string;
@@ -113,6 +114,26 @@ async function loadConfig(agentDir: string, kind: ChatDaemonKind): Promise<ChatD
 		return {
 			identity,
 			notifications: { discord: { botToken, applicationId, guildId, parentChannelId } },
+			presentation: { redact: config.redact, verbosity: config.verbosity },
+		};
+	}
+	if (kind === "feishu-app") {
+		const resolution = resolveNotificationProvider(config, "feishu-app");
+		if (!resolution.desiredEnabled) return undefined;
+		if (resolution.quarantined) throw new Error("Feishu-app notification configuration needs repair");
+		if (!resolution.configured || !isFeishuAppComplete(config)) {
+			throw new Error("Feishu-app notifications are enabled but configuration is incomplete");
+		}
+		const feishuApp = config["feishu-app"];
+		const { appId, appSecret, chatId, authorizedOpenIds } = feishuApp;
+		const identity = crypto
+			.createHash("sha256")
+			.update([appId, appSecret, chatId, authorizedOpenIds, String(config.redact), config.verbosity].join("\0"))
+			.digest("hex")
+			.slice(0, 16);
+		return {
+			identity,
+			notifications: { "feishu-app": { appId, appSecret, chatId, authorizedOpenIds } },
 			presentation: { redact: config.redact, verbosity: config.verbosity },
 		};
 	}

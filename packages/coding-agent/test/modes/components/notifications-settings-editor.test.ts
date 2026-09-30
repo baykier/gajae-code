@@ -91,6 +91,8 @@ function state(): NotificationsEditorState {
 			},
 			discord: adapterState(true, "discord-channel"),
 			slack: adapterState(true, "slack-channel"),
+			feishu: adapterState(true, "group webhook"),
+			"feishu-app": adapterState(false, undefined),
 		},
 		session: {
 			eligible: true,

@@ -55,6 +55,8 @@ function snapshot(overrides: Partial<NotificationSettingsSnapshot> = {}): Notifi
 		discord: {},
 		slack: {},
 		redact: false,
+		feishu: {},
+		"feishu-app": {},
 		verbosity: "lean",
 		sessionScope: "all",
 		idleTimeoutMs: 60_000,

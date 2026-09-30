@@ -20,8 +20,8 @@ import { sendAuthorizedChatOperation } from "../src/sdk/bus/chat-command-policy"
 import { OPERATIONS } from "../src/sdk/protocol/operation-registry";
 import { type Expected, inputFor, parityRow } from "./helpers/sdk-adapter-dispositions-shared";
 
-const chatAdapters = ["telegram", "discord", "slack"] as const;
-const chatPrefix = { telegram: "T", discord: "D", slack: "S" } as const;
+const chatAdapters = ["telegram", "discord", "slack", "feishu-app"] as const;
+const chatPrefix = { telegram: "T", discord: "D", slack: "S", "feishu-app": "F" } as const;
 for (const adapter of chatAdapters) {
 	for (const operation of OPERATIONS.filter(candidate => candidate.kind !== "reverse")) {
 		test(`AD-${chatPrefix[adapter]}-${operation.id}: ${operation.sdkId} chat disposition`, async () => {

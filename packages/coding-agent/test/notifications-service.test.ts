@@ -1851,6 +1851,117 @@ describe("notification-service diagnostic sanitization (secret-safe)", () => {
 		expect(sanitizeDiagnostic("leaked 998877665:ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")).toContain("<redacted>");
 	});
 
+	test("feishu-app status renders appSecret credential and destination", () => {
+		const settings = Settings.isolated({
+			"notifications.enabled": true,
+			"notifications.feishu-app.appId": "cli_app",
+			"notifications.feishu-app.appSecret": "feishu-app-secret-value",
+			"notifications.feishu-app.chatId": "oc_chat",
+			"notifications.feishu-app.authorizedOpenIds": "ou_a",
+			"notifications.feishu-app.enabled": true,
+		});
+		const report = formatNotificationStatusReport(buildNotificationStatusReport(settings));
+		expect(report).toContain("feishu-app.configured: yes");
+		expect(report).toContain("feishu-app.appSecret: ");
+		expect(report).not.toContain("feishu-app-secret-value");
+		expect(report).toContain("feishu-app.destination: oc_chat");
+	});
+
+	test("feishu-app health probe validates credentials and chat visibility read-only", async () => {
+		const settings = Settings.isolated({
+			"notifications.enabled": true,
+			"notifications.feishu-app.appId": "cli_app",
+			"notifications.feishu-app.appSecret": "feishu-app-secret-value",
+			"notifications.feishu-app.chatId": "oc_chat",
+			"notifications.feishu-app.authorizedOpenIds": "ou_a",
+			"notifications.feishu-app.enabled": true,
+		});
+		const calls: string[] = [];
+		const fetchImpl = (async (url: string | URL | Request, init?: RequestInit) => {
+			const href = String(url);
+			calls.push(`${init?.method ?? "GET"} ${href}`);
+			if (href.endsWith("/tenant_access_token/internal")) {
+				return new Response(JSON.stringify({ code: 0, msg: "ok", tenant_access_token: "t-tenant-token" }), {
+					status: 200,
+				});
+			}
+			return new Response(JSON.stringify({ code: 0, msg: "ok", data: { chat_id: "oc_chat" } }), { status: 200 });
+		}) as unknown as typeof fetch;
+		const report = await checkNotificationHealth({
+			settings,
+			stateRoot: "/tmp/gjc-feishu-app-probe",
+			provider: "feishu-app",
+			probe: true,
+			deps: { fs: mockFs({}).fs, fetchImpl },
+		});
+		expect(report.overall).toBe("ok");
+		expect(report.reachability.detail).toBe("credentials accepted and the bot can access the bound chat");
+		expect(calls.some(call => call.includes("/im/v1/chats/oc_chat"))).toBe(true);
+		expect(calls.every(call => call.startsWith("POST") || call.startsWith("GET"))).toBe(true);
+	});
+
+	test("feishu-app health probe reports credential rejection and redacts the secret", async () => {
+		const secret = "feishu-app-secret-value";
+		const settings = Settings.isolated({
+			"notifications.enabled": true,
+			"notifications.feishu-app.appId": "cli_app",
+			"notifications.feishu-app.appSecret": secret,
+			"notifications.feishu-app.chatId": "oc_chat",
+			"notifications.feishu-app.authorizedOpenIds": "ou_a",
+			"notifications.feishu-app.enabled": true,
+		});
+		const fetchImpl = (async () =>
+			new Response(JSON.stringify({ code: 99991663, msg: `invalid app_secret ${secret}` }), {
+				status: 200,
+			})) as unknown as typeof fetch;
+		const report = await checkNotificationHealth({
+			settings,
+			stateRoot: "/tmp/gjc-feishu-app-badsecret",
+			provider: "feishu-app",
+			probe: true,
+			deps: { fs: mockFs({}).fs, fetchImpl },
+		});
+		expect(report.overall).toBe("error");
+		expect(report.reachability.detail).toContain("invalid app_secret <redacted>");
+		expect(report.reachability.detail).not.toContain(secret);
+	});
+
+	test("feishu-app one-shot test delivers through the diagnostic adapter only when runtime is ready", async () => {
+		const settings = Settings.isolated({
+			"notifications.enabled": true,
+			"notifications.feishu-app.appId": "cli_app",
+			"notifications.feishu-app.appSecret": "feishu-app-secret-value",
+			"notifications.feishu-app.chatId": "oc_chat",
+			"notifications.feishu-app.authorizedOpenIds": "ou_a",
+			"notifications.feishu-app.enabled": true,
+		});
+		const notReady = await sendNotificationTest({
+			settings,
+			provider: "feishu-app",
+			deps: { providerRuntimeStatus: () => "inactive" },
+		});
+		expect(notReady.ok).toBe(false);
+		expect(notReady.detail).toBe("feishu-app runtime is not ready or attached.");
+		const sent: string[] = [];
+		const result = await sendNotificationTest({
+			settings,
+			provider: "feishu-app",
+			deps: {
+				providerRuntimeStatus: () => "ready",
+				createFeishuAppDiagnostic: () => ({
+					sendText: async text => {
+						sent.push(text);
+						return { ok: true, messageId: "om_1" };
+					},
+				}),
+			},
+		});
+		expect(result.ok).toBe(true);
+		expect(result.adapter).toBe("feishu-app");
+		expect(result.destination).toBe("oc_chat");
+		expect(sent).toEqual(["GJC notifications test message. If you can read this, delivery works."]);
+	});
+
 	test("test delivery never leaks the token in an error detail", async () => {
 		const settings = Settings.isolated({
 			"notifications.enabled": true,

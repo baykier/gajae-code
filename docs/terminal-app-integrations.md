@@ -248,6 +248,7 @@ For phone access to GJC itself — questions, approvals, and prompts from a mobi
 ships first-class remote surfaces that do not depend on T3 Code:
 
 - [Telegram onboarding](./telegram-onboarding.md) — answer the agent from your phone
+- [Feishu onboarding](./feishu-onboarding.md) — push-only webhook notifications, or two-way conversation through the enterprise app bot
 - [Discord onboarding](./discord-onboarding.md)
 - [Bot / external controller integration](./bot-integration.md)
 - [SDK & wire protocol](./sdk.md) · [SDK session CLI](./sdk-session-cli.md)

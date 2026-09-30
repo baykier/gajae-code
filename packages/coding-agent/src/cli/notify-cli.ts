@@ -11,6 +11,7 @@ import {
 	ChatDaemonController,
 	type EnsureChatDaemonResult,
 	ensureDiscordDaemon,
+	ensureFeishuAppDaemon,
 	ensureSlackDaemon,
 } from "../sdk/bus/chat-daemon-control";
 import { getNotificationConfig, maskToken, tokenFingerprint } from "../sdk/bus/config";
@@ -66,7 +67,18 @@ export type NotifyAction =
 	| "bind-thread"
 	| "activate-thread"
 	| "daemon-internal";
-export type NotifySetupProvider = "telegram" | "discord" | "slack";
+export type NotifySetupProvider = "telegram" | "discord" | "slack" | "feishu" | "feishu-app";
+export const NOTIFY_SETUP_PROVIDERS: readonly NotifySetupProvider[] = [
+	"telegram",
+	"discord",
+	"slack",
+	"feishu",
+	"feishu-app",
+];
+
+export function notifySetupProvider(value: string | undefined): NotifySetupProvider | undefined {
+	return NOTIFY_SETUP_PROVIDERS.find(provider => provider === value);
+}
 
 export interface NotifyCommandArgs {
 	action: NotifyAction;
@@ -84,6 +96,12 @@ export interface NotifyCommandArgs {
 	slackWorkspaceId?: string;
 	slackChannelId?: string;
 	slackAuthorizedUserId?: string;
+	feishuWebhookUrl?: string;
+	feishuSecret?: string;
+	feishuAppId?: string;
+	feishuAppSecret?: string;
+	feishuAppChatId?: string;
+	feishuAppAuthorizedOpenIds?: string;
 	redact?: boolean;
 	forceDaemonLock?: boolean;
 	probe?: boolean;
@@ -115,7 +133,10 @@ export interface NotifyCommandDeps {
 	setupPidAlive?: (pid: number) => boolean;
 	/** Injectable process-start provenance reader for ambient Telegram setup preflight. */
 	setupPidIncarnation?: (pid: number) => string | undefined;
-	ensureProviderDaemon?: (provider: "discord" | "slack", settings: Settings) => Promise<EnsureChatDaemonResult>;
+	ensureProviderDaemon?: (
+		provider: "discord" | "slack" | "feishu-app",
+		settings: Settings,
+	) => Promise<EnsureChatDaemonResult>;
 	ensureTelegramDaemon?: (settings: Settings) => Promise<EnsureTelegramDaemonDetailedResult>;
 	bindSlackThread?: (input: { settings: Settings; sessionId: string; threadTs: string }) => Promise<BoundSlackThread>;
 	activatePreparedSession?: (input: { settings: Settings; sessionId: string }) => Promise<ActivatedPreparedSession>;
@@ -124,8 +145,7 @@ export interface NotifyCommandDeps {
 export function parseNotifyArgs(args: string[]): NotifyCommandArgs | undefined {
 	if (args.length === 0 || args[0] !== "notify") return undefined;
 	const action = args[1];
-	const providerValue = (value: string | undefined): NotifySetupProvider | undefined =>
-		value === "telegram" || value === "discord" || value === "slack" ? value : undefined;
+	const providerValue = notifySetupProvider;
 	const parseFlags = (
 		rest: string[],
 		valueFlags: ReadonlySet<string>,
@@ -166,6 +186,12 @@ export function parseNotifyArgs(args: string[]): NotifyCommandArgs | undefined {
 				"--slack-workspace-id",
 				"--slack-channel-id",
 				"--slack-authorized-user-id",
+				"--feishu-webhook-url",
+				"--feishu-secret",
+				"--feishu-app-id",
+				"--feishu-app-secret",
+				"--feishu-app-chat-id",
+				"--feishu-app-authorized-open-ids",
 			]),
 			new Set(["--redact"]),
 		);
@@ -189,6 +215,12 @@ export function parseNotifyArgs(args: string[]): NotifyCommandArgs | undefined {
 			slackWorkspaceId: value("--slack-workspace-id"),
 			slackChannelId: value("--slack-channel-id"),
 			slackAuthorizedUserId: value("--slack-authorized-user-id"),
+			feishuWebhookUrl: value("--feishu-webhook-url"),
+			feishuSecret: value("--feishu-secret"),
+			feishuAppId: value("--feishu-app-id"),
+			feishuAppSecret: value("--feishu-app-secret"),
+			feishuAppChatId: value("--feishu-app-chat-id"),
+			feishuAppAuthorizedOpenIds: value("--feishu-app-authorized-open-ids"),
 			redact: flags.get("--redact") === true,
 		};
 	}
@@ -322,6 +354,14 @@ async function runSetup(cmd: NotifyCommandArgs, deps: NotifyCommandDeps): Promis
 		await runSlackSetup(cmd, deps);
 		return;
 	}
+	if (provider === "feishu") {
+		await runFeishuSetup(cmd, deps);
+		return;
+	}
+	if (provider === "feishu-app") {
+		await runFeishuAppSetup(cmd, deps);
+		return;
+	}
 	await runTelegramSetup(cmd, deps);
 }
 
@@ -447,26 +487,120 @@ async function runSlackSetup(cmd: NotifyCommandArgs, deps: NotifyCommandDeps): P
 	);
 }
 
+async function runFeishuSetup(cmd: NotifyCommandArgs, deps: NotifyCommandDeps): Promise<void> {
+	const webhookUrl = await promptSetupValue(cmd.feishuWebhookUrl, "--feishu-webhook-url", true, deps);
+	// The signing secret is optional: without it the webhook sends unsigned requests.
+	const secret = cmd.feishuSecret?.trim() || undefined;
+	const settings = await getSettings(deps);
+	const result = await mutateNotificationProvider({
+		settings,
+		mutation: {
+			provider: "feishu",
+			webhookUrl: { action: "replace", value: webhookUrl },
+			...(secret ? { secret: { action: "replace", value: secret } } : {}),
+		},
+		configureAndActivate: true,
+		...(cmd.redact ? { redact: true } : {}),
+	});
+	if (result.status === "commit_failed")
+		throw new Error("Feishu configuration was not saved because the CAS commit failed.");
+	process.stdout.write(
+		`Feishu configuration saved. webhookUrl=${maskToken(webhookUrl)} secret=${secret ? maskToken(secret) : "(unset; unsigned requests)"}\n`,
+	);
+}
+
+async function runFeishuAppSetup(cmd: NotifyCommandArgs, deps: NotifyCommandDeps): Promise<void> {
+	const appId = await promptSetupValue(cmd.feishuAppId, "--feishu-app-id", true, deps);
+	const appSecret = await promptSetupValue(cmd.feishuAppSecret, "--feishu-app-secret", true, deps);
+	const chatId = await promptSetupValue(cmd.feishuAppChatId, "--feishu-app-chat-id", false, deps);
+	// Comma-separated open_id allowlist; empty means inbound from any member of the app's visible scope is denied.
+	const authorizedOpenIds =
+		cmd.feishuAppAuthorizedOpenIds?.trim() ||
+		(await promptOptionalValue("--feishu-app-authorized-open-ids", deps)) ||
+		undefined;
+	const settings = await getSettings(deps);
+	let activationFailure: string | undefined;
+	let activationOutcome: EnsureChatDaemonResult | undefined;
+	const runtime: NotificationProviderRuntimeAuthority = {
+		activate: async provider => {
+			if (provider !== "feishu-app") throw new Error("Unexpected provider activation request.");
+			try {
+				const result = await ensureConfiguredProviderDaemon("feishu-app", settings, deps);
+				if (result === "disabled") throw new Error("Feishu app runtime did not activate.");
+				activationOutcome = result;
+			} catch (error) {
+				activationFailure = error instanceof Error ? error.message : "Feishu app runtime activation failed.";
+				throw error;
+			}
+		},
+		deactivate: async () => undefined,
+	};
+	const result = await mutateNotificationProvider({
+		settings,
+		mutation: {
+			provider: "feishu-app",
+			appId: { action: "replace", value: appId },
+			appSecret: { action: "replace", value: appSecret },
+			...(chatId ? { chatId } : {}),
+			...(authorizedOpenIds ? { authorizedOpenIds } : {}),
+		},
+		configureAndActivate: true,
+		runtime,
+		...(cmd.redact ? { redact: true } : {}),
+	});
+	if (result.status === "commit_failed")
+		throw new Error("Feishu app configuration was not saved because the CAS commit failed.");
+	if (activationFailure) {
+		process.stderr.write(`Feishu app configuration saved, but ${activationFailure}.\n`);
+		if (deps.setExitCode) deps.setExitCode(1);
+		else process.exitCode = 1;
+		return;
+	}
+	process.stdout.write(
+		`Feishu app configuration saved and activated. appId=${maskToken(appId)} appSecret=${maskToken(appSecret)} chatId=${chatId ?? "(unset; first authorized sender binds the chat)"} authorizedOpenIds=${authorizedOpenIds ?? "(unset; inbound denied)"} daemon=${activationOutcome ?? "attached"}\n`,
+	);
+}
+/**
+ * Interactive-only optional prompt; returns undefined when non-interactive or
+ * left empty, so optional setup values keep their flag-only workflow.
+ */
+async function promptOptionalValue(label: string, deps: NotifyCommandDeps): Promise<string | undefined> {
+	if (!resolveSetupInteractive(deps)) return undefined;
+	const value = await (deps.valuePrompt ?? promptForValue)(`${label.slice(2)}: `, false);
+	const trimmed = value.trim();
+	return trimmed.length > 0 ? trimmed : undefined;
+}
+
 async function ensureConfiguredProviderDaemon(
-	provider: "discord" | "slack",
+	provider: "discord" | "slack" | "feishu-app",
 	settings: Settings,
 	deps: NotifyCommandDeps,
 ): Promise<EnsureChatDaemonResult> {
 	try {
 		if (deps.ensureProviderDaemon) return await deps.ensureProviderDaemon(provider, settings);
-		return provider === "discord" ? await ensureDiscordDaemon(settings) : await ensureSlackDaemon(settings);
+		if (provider === "discord") return await ensureDiscordDaemon(settings);
+		if (provider === "slack") return await ensureSlackDaemon(settings);
+		return await ensureFeishuAppDaemon(settings);
 	} catch (error) {
 		const cfg = getNotificationConfig(settings);
+		const outerSecret =
+			provider === "discord"
+				? cfg.discord.botToken
+				: provider === "slack"
+					? cfg.slack.appToken
+					: cfg["feishu-app"].appSecret;
+		const innerSecret =
+			provider === "discord"
+				? cfg.discord.botToken
+				: provider === "slack"
+					? cfg.slack.botToken
+					: cfg["feishu-app"].appId;
 		const detail = sanitizeDiagnostic(
-			sanitizeDiagnostic(
-				error instanceof Error ? error.message : String(error),
-				provider === "discord" ? cfg.discord.botToken : cfg.slack.appToken,
-			),
-			provider === "discord" ? cfg.discord.botToken : cfg.slack.botToken,
+			sanitizeDiagnostic(error instanceof Error ? error.message : String(error), outerSecret),
+			innerSecret,
 		);
-		throw new Error(`${provider === "discord" ? "Discord" : "Slack"} daemon did not become ready: ${detail}`, {
-			cause: error,
-		});
+		const label = provider === "discord" ? "Discord" : provider === "slack" ? "Slack" : "Feishu app";
+		throw new Error(`${label} daemon did not become ready: ${detail}`, { cause: error });
 	}
 }
 
@@ -788,7 +922,9 @@ async function runTest(deps: NotifyCommandDeps, cmd: NotifyCommandArgs): Promise
 				const status =
 					provider === "telegram"
 						? await new TelegramDaemonController(settings).status()
-						: await new ChatDaemonController(settings, provider).status();
+						: provider === "feishu"
+							? { health: "running" as const }
+							: await new ChatDaemonController(settings, provider).status();
 				return status.health === "running" ? "ready" : "inactive";
 			},
 		},
@@ -950,11 +1086,13 @@ ${chalk.bold("Interactive path:")}
 
 ${chalk.bold("Usage:")}
   ${APP_NAME} notify setup [telegram]
+  ${APP_NAME} notify setup feishu --feishu-webhook-url <url> [--feishu-secret <secret>]
+  ${APP_NAME} notify setup feishu-app --feishu-app-id <appId> --feishu-app-secret <secret> [--feishu-app-chat-id <id>] [--feishu-app-authorized-open-ids <id[,id]>]
   ${APP_NAME} notify setup discord --discord-bot-token <token> --discord-application-id <id> --discord-guild-id <id> --discord-parent-channel-id <id>
   ${APP_NAME} notify setup slack --slack-bot-token <token> --slack-app-token <token> --slack-workspace-id <id> --slack-channel-id <id> [--slack-authorized-user-id <id>]
   ${APP_NAME} notify status
-  ${APP_NAME} notify health [--provider telegram|discord|slack] [--probe]
-  ${APP_NAME} notify test [--provider telegram|discord|slack] [--message <text>]
+  ${APP_NAME} notify health [--provider telegram|discord|slack|feishu|feishu-app] [--probe]
+  ${APP_NAME} notify test [--provider telegram|discord|slack|feishu|feishu-app] [--message <text>]
   ${APP_NAME} notify recovery [--force-daemon-lock]
   ${APP_NAME} notify bind-thread --session-id <sessionId> --thread-ts <rootTs>
   ${APP_NAME} notify activate-thread --session-id <sessionId>
@@ -973,6 +1111,8 @@ ${chalk.bold("Examples:")}
   ${APP_NAME} notify setup --token <botToken> --chat-id <chatId> [--redact]
   ${APP_NAME} notify setup discord --discord-bot-token <token> --discord-application-id <id> --discord-guild-id <id> --discord-parent-channel-id <id>
   ${APP_NAME} notify setup slack --slack-bot-token <token> --slack-app-token <token> --slack-workspace-id <id> --slack-channel-id <id> [--slack-authorized-user-id <id>]
+  ${APP_NAME} notify setup feishu --feishu-webhook-url <url> [--feishu-secret <secret>]
+  ${APP_NAME} notify setup feishu-app --feishu-app-id <appId> --feishu-app-secret <secret> [--feishu-app-chat-id <id>] [--feishu-app-authorized-open-ids <id[,id]>]
   ${APP_NAME} notify status
   ${APP_NAME} notify health --provider discord --probe
   ${APP_NAME} notify test --provider slack --message "hello from gjc"

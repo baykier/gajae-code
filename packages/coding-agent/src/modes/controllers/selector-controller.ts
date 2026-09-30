@@ -399,6 +399,7 @@ export function createNotificationsEditorOperations(
 				await ctx.session.notificationSessionController?.reconcileCurrentSession(sessionContext());
 				return;
 			}
+			if (provider === "feishu") return; // Stateless webhook: nothing to spawn or stop.
 			const result = await new ChatDaemonController(ctx.settings, provider).ensure();
 			if (result === "disabled") throw new Error(`${provider} activation failed after the durable save.`);
 		},
@@ -409,6 +410,7 @@ export function createNotificationsEditorOperations(
 				await ctx.session.notificationSessionController?.reconcileCurrentSession(sessionContext());
 				return;
 			}
+			if (provider === "feishu") return; // Stateless webhook: nothing to spawn or stop.
 			const result = await new ChatDaemonController(ctx.settings, provider).stop();
 			if (!result.ok) throw new Error(result.message);
 		},
@@ -422,7 +424,9 @@ export function createNotificationsEditorOperations(
 				const daemon =
 					provider === "telegram"
 						? await new TelegramDaemonController(ctx.settings).status()
-						: await new ChatDaemonController(ctx.settings, provider).status();
+						: provider === "feishu"
+							? { health: "running" as const }
+							: await new ChatDaemonController(ctx.settings, provider).status();
 				return daemon.health === "running" ? "ready" : daemon.health === "not_configured" ? "inactive" : "failed";
 			};
 			const [telegramRuntime, discordRuntime, slackRuntime] = await Promise.all([
@@ -433,6 +437,7 @@ export function createNotificationsEditorOperations(
 			status.telegram.runtime = telegramRuntime;
 			status.discord.runtime = discordRuntime;
 			status.slack.runtime = slackRuntime;
+			status.feishu.runtime = "ready"; // Stateless webhook delivery is always ready.
 			return {
 				status,
 				session:
@@ -490,7 +495,9 @@ export function createNotificationsEditorOperations(
 							const status =
 								selected === "telegram"
 									? await new TelegramDaemonController(ctx.settings).status()
-									: await new ChatDaemonController(ctx.settings, selected).status();
+									: selected === "feishu"
+										? { health: "running" as const }
+										: await new ChatDaemonController(ctx.settings, selected).status();
 							return status.health === "running" ? "ready" : "inactive";
 						},
 					},
@@ -938,7 +945,15 @@ export function createNotificationsEditorOperations(
 					? { provider, botToken: { action: "keep" } }
 					: provider === "discord"
 						? { provider, botToken: { action: "keep" } }
-						: { provider, botToken: { action: "keep" }, appToken: { action: "keep" } };
+						: provider === "feishu"
+							? { provider, webhookUrl: { action: "keep" } }
+							: provider === "feishu-app"
+								? {
+										provider,
+										appId: { action: "keep" },
+										appSecret: { action: "keep" },
+									}
+								: { provider, botToken: { action: "keep" }, appToken: { action: "keep" } };
 			const result = await mutateNotificationProvider({
 				settings: ctx.settings,
 				mutation,

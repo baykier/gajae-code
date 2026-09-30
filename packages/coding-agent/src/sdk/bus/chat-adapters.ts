@@ -6,7 +6,7 @@ import type {
 } from "./engine";
 import { truncate } from "./helpers";
 
-type AdapterKind = "discord" | "slack";
+type AdapterKind = "discord" | "slack" | "feishu-app";
 
 interface ChatAdapterOptions {
 	kind: AdapterKind;
@@ -30,7 +30,10 @@ function publicLine(label: string, value: unknown): string | undefined {
 	return v ? `${label}: ${truncate(v, 280)}` : undefined;
 }
 
-function actionText(event: Extract<NotificationEvent, { type: "action_needed" }>, format: "discord" | "slack"): string {
+function actionText(
+	event: Extract<NotificationEvent, { type: "action_needed" }>,
+	format: "discord" | "slack" | "feishu-app",
+): string {
 	if (event.kind === "idle") {
 		const summary = text(event.summary);
 		return summary ? `Agent idle\n${truncate(summary, 1200)}` : "Agent idle";
@@ -42,7 +45,7 @@ function actionText(event: Extract<NotificationEvent, { type: "action_needed" }>
 		lines.push(
 			...options.map((option, index) => {
 				const label = truncate(option, 180);
-				return format === "slack" ? `${index + 1}. ${label}` : `**${index + 1}.** ${label}`;
+				return format === "discord" ? `**${index + 1}.** ${label}` : `${index + 1}. ${label}`;
 			}),
 		);
 	} else {
@@ -144,4 +147,34 @@ export function createDiscordAdapter(opts: Omit<ChatAdapterOptions, "kind"> = {}
 
 export function createSlackAdapter(opts: Omit<ChatAdapterOptions, "kind"> = {}): NotificationPresentationAdapter {
 	return new SlackNotificationAdapter({ ...opts, kind: "slack" });
+}
+
+/** Feishu surfaces plain text messages; the daemon turns the body into the API request. */
+class FeishuAppNotificationAdapter implements NotificationPresentationAdapter {
+	readonly kind = "feishu-app" as const;
+	constructor(private readonly opts: ChatAdapterOptions) {}
+
+	render(event: NotificationEvent): NotificationAdapterPayload[] {
+		if (event.type === "action_resolved") return [];
+		const textValue = event.type === "action_needed" ? actionText(event, "feishu-app") : frameText(event);
+		if (!textValue) return [];
+		const payload: Record<string, unknown> = { text: textValue };
+		if (this.opts.channelId) payload.chat_id = this.opts.channelId;
+		return [
+			{
+				adapter: this.kind,
+				channelKey: this.opts.channelId,
+				body: payload,
+				route: event.type === "action_needed" ? { sessionId: event.sessionId, actionId: event.id } : undefined,
+			},
+		];
+	}
+
+	mapInbound(input: unknown): NotificationReplyRoute | undefined {
+		return routeFromInbound(input);
+	}
+}
+
+export function createFeishuAppAdapter(opts: Omit<ChatAdapterOptions, "kind"> = {}): NotificationPresentationAdapter {
+	return new FeishuAppNotificationAdapter({ ...opts, kind: "feishu-app" });
 }

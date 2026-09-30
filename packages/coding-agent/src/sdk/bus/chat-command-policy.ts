@@ -1,7 +1,7 @@
 import { validateAdapterSecretFields } from "../protocol/adapter-validation";
 import { type Adapter, OPERATIONS, type Operation, type OperationKind } from "../protocol/operation-registry";
 
-export type ChatTransport = Extract<Adapter, "telegram" | "discord" | "slack">;
+export type ChatTransport = Extract<Adapter, "telegram" | "discord" | "slack" | "feishu-app">;
 export type ChatOperationDisposition = "allowed" | "unsupported_on_chat";
 
 export interface ChatCommandError {
@@ -45,6 +45,7 @@ export const CHAT_OPERATION_POLICY: Readonly<
 	telegram: buildChatOperationPolicy("telegram"),
 	discord: buildChatOperationPolicy("discord"),
 	slack: buildChatOperationPolicy("slack"),
+	"feishu-app": buildChatOperationPolicy("feishu-app"),
 };
 
 function unsupported(): ChatCommandDecision {

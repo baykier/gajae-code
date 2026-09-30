@@ -67,6 +67,8 @@ function snapshot(overrides: Partial<NotificationSettingsSnapshot> = {}): Notifi
 		slack: {},
 		redact: false,
 		verbosity: "lean",
+		feishu: {},
+		"feishu-app": {},
 		sessionScope: "all",
 		idleTimeoutMs: 60_000,
 		...overrides,
@@ -163,6 +165,8 @@ function editorState(): NotificationsEditorState {
 			telegram: { ...adapterState(), tokenFingerprint: undefined },
 			discord: adapterState(),
 			slack: adapterState(),
+			feishu: adapterState(),
+			"feishu-app": adapterState(),
 		},
 		session: sessionStatus(),
 		preferences: {

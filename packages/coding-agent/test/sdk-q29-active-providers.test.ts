@@ -147,6 +147,7 @@ describe("Q29 providers.list/active", () => {
 			telegram: "prohibited",
 			discord: "prohibited",
 			slack: "prohibited",
+			"feishu-app": "prohibited",
 			mcp: "generic_safe",
 			acp: "generic_safe",
 			daemonCli: "generic_safe",

@@ -570,10 +570,27 @@ export interface SlackProviderConfigurationMutation {
 	authorizedUserId?: string | null;
 }
 
+export interface FeishuProviderConfigurationMutation {
+	provider: "feishu";
+	/** The webhook URL is the credential: it embeds the hook token. */
+	webhookUrl: ProviderSecretMutation;
+	secret?: ProviderSecretMutation;
+}
+
+export interface FeishuAppProviderConfigurationMutation {
+	provider: "feishu-app";
+	appId: ProviderSecretMutation;
+	appSecret: ProviderSecretMutation;
+	chatId?: string;
+	authorizedOpenIds?: string;
+}
+
 export type NotificationProviderConfigurationMutation =
 	| TelegramProviderConfigurationMutation
 	| DiscordProviderConfigurationMutation
-	| SlackProviderConfigurationMutation;
+	| SlackProviderConfigurationMutation
+	| FeishuProviderConfigurationMutation
+	| FeishuAppProviderConfigurationMutation;
 
 export interface NotificationProviderRuntimeAuthority {
 	activate(provider: NotificationProvider): Promise<void>;
@@ -592,7 +609,11 @@ function secretMutationPatches(
 		| "notifications.telegram.botToken"
 		| "notifications.discord.botToken"
 		| "notifications.slack.botToken"
-		| "notifications.slack.appToken",
+		| "notifications.slack.appToken"
+		| "notifications.feishu.webhookUrl"
+		| "notifications.feishu.secret"
+		| "notifications.feishu-app.appId"
+		| "notifications.feishu-app.appSecret",
 	mutation: ProviderSecretMutation,
 ): SettingsAtomicPatch[] {
 	if (mutation.action === "keep") return [];
@@ -623,6 +644,20 @@ function selectedProviderPatches(mutation: NotificationProviderConfigurationMuta
 			...optionalSet("notifications.discord.parentChannelId", mutation.parentChannelId),
 		];
 	}
+	if (mutation.provider === "feishu") {
+		return [
+			...secretMutationPatches("notifications.feishu.webhookUrl", mutation.webhookUrl),
+			...(mutation.secret ? secretMutationPatches("notifications.feishu.secret", mutation.secret) : []),
+		];
+	}
+	if (mutation.provider === "feishu-app") {
+		return [
+			...secretMutationPatches("notifications.feishu-app.appId", mutation.appId),
+			...secretMutationPatches("notifications.feishu-app.appSecret", mutation.appSecret),
+			...optionalSet("notifications.feishu-app.chatId", mutation.chatId),
+			...optionalSet("notifications.feishu-app.authorizedOpenIds", mutation.authorizedOpenIds),
+		];
+	}
 	return [
 		...secretMutationPatches("notifications.slack.botToken", mutation.botToken),
 		...secretMutationPatches("notifications.slack.appToken", mutation.appToken),
@@ -639,10 +674,15 @@ function selectedProviderPatches(mutation: NotificationProviderConfigurationMuta
 function providerDesiredPath(provider: NotificationProvider): SettingsAtomicPatch["path"] {
 	if (provider === "telegram") return "notifications.telegram.enabled";
 	if (provider === "discord") return "notifications.discord.enabled";
+	if (provider === "feishu") return "notifications.feishu.enabled";
+	if (provider === "feishu-app") return "notifications.feishu-app.enabled";
 	return "notifications.slack.enabled";
 }
 
 function mutationRemovesRequiredSecret(mutation: NotificationProviderConfigurationMutation): boolean {
+	if (mutation.provider === "feishu") return mutation.webhookUrl.action === "remove";
+	if (mutation.provider === "feishu-app")
+		return mutation.appId.action === "remove" || mutation.appSecret.action === "remove";
 	if (mutation.provider === "telegram" || mutation.provider === "discord")
 		return mutation.botToken.action === "remove";
 	return mutation.botToken.action === "remove" || mutation.appToken.action === "remove";
@@ -732,6 +772,15 @@ function providerRemovalPatches(provider: NotificationProvider): SettingsAtomicP
 			{ path: "notifications.discord.enabled", op: "set", value: false },
 		];
 	}
+	if (provider === "feishu-app") {
+		return [
+			{ path: "notifications.feishu-app.appId", op: "unset" },
+			{ path: "notifications.feishu-app.appSecret", op: "unset" },
+			{ path: "notifications.feishu-app.chatId", op: "unset" },
+			{ path: "notifications.feishu-app.authorizedOpenIds", op: "unset" },
+			{ path: "notifications.feishu-app.enabled", op: "set", value: false },
+		];
+	}
 	return [
 		{ path: "notifications.slack.botToken", op: "unset" },
 		{ path: "notifications.slack.appToken", op: "unset" },
@@ -819,7 +868,7 @@ export async function setGlobalNotificationsEnabled(input: {
 	const failed: NotificationProvider[] = [];
 	if (input.enabled) {
 		const cfg = getNotificationConfig(input.settings);
-		for (const provider of ["telegram", "discord", "slack"] as const) {
+		for (const provider of ["telegram", "discord", "slack", "feishu-app"] as const) {
 			if (!isProviderEffectivelyEnabled(cfg, provider)) continue;
 			if (provider === "telegram" && getCurrentTelegramActivationMarker(cfg)) continue;
 			try {
@@ -832,7 +881,7 @@ export async function setGlobalNotificationsEnabled(input: {
 			? { status: "saved", receipt, observerFailed }
 			: { status: "global_activation_partial", receipt, failed, observerFailed };
 	}
-	for (const provider of ["telegram", "discord", "slack"] as const) {
+	for (const provider of ["telegram", "discord", "slack", "feishu-app"] as const) {
 		try {
 			await input.runtime.deactivate(provider);
 		} catch {

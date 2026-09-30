@@ -743,7 +743,7 @@ This is a readonly resolver/listing contract. Do not import `@gajae-code/coding-
 The resolver uses canonical native identity: supported POSIX and Windows local aliases can designate one scope, while UNC/network workspaces are unsupported. Scope digests are collision-resistant identifiers, not injective aliases, credentials, or authentication. The owner-only checks protect managed local storage paths but do not authenticate an adapter or make hostile concurrent filesystem races safe. Adapters that need mutations must use the higher-level lifecycle/session APIs rather than the readonly directory API.
 ## Managed notification adapters
 
-GJC ships managed SDK adapters for Telegram, Discord, and Slack. `SessionRouter` resolves one session-owned endpoint per attachment and keeps every endpoint credential inside SDK core. Provider daemons receive only opaque attachment capabilities; they neither change the wire protocol nor expose a remote shell.
+GJC ships managed SDK adapters for Telegram, Discord, and Slack, plus a push-only Feishu custom-bot webhook. `SessionRouter` resolves one session-owned endpoint per attachment and keeps every endpoint credential inside SDK core. Provider daemons receive only opaque attachment capabilities; they neither change the wire protocol nor expose a remote shell.
 
 The recommended interactive path is `/settings` → **Notifications**. It owns
 setup, health, test, recovery, reconnect, local enablement, and Telegram
@@ -770,6 +770,14 @@ Configuration completeness, provider-local quarantine, durable desired intent, e
 - [Slack notification onboarding](./slack-onboarding.md) documents
   `gjc notify setup slack`, Socket Mode configuration, immediate envelope ack,
   and thread lifecycle.
+- [Feishu notification onboarding](./feishu-onboarding.md) documents
+  `gjc notify setup feishu` (push-only custom-bot webhook: body signing,
+  chunking, retry, flow-limit behavior) and `gjc notify setup feishu-app`
+  (enterprise self-built app bot over the WebSocket long connection, with
+  interactive ask cards, open_id authorization, `/sdk` command routing, and
+  free-form chat dispatched into the bound session as a durable `turn.prompt`
+  control request — accepted prompts are acked in chat, and prompts submitted
+  mid-run queue for the next idle boundary).
 
 `gjc notify status` reports provider completeness, repair/quarantine state, desired intent, effective enablement, and masked tokens. Destination identifiers remain visible and may be sensitive. The Discord and Slack setup commands are non-interactive and require their documented identifier and token flags; supply secrets through an approved local mechanism, not examples, committed files, shell history, logs, or chat. `gjc notify health --provider <provider> --probe` performs a provider-owned REST diagnostic even when complete credentials are intentionally inactive, while `gjc notify test --provider <provider>` additionally requires effective enablement and runtime readiness.
 

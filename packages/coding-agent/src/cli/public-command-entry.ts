@@ -97,7 +97,7 @@ export function scanPublicCommand(family: PublicCommandFamily, argv: readonly st
 	};
 	if (
 		family === "daemon" &&
-		(argv[0] === "discord-internal" || argv[0] === "slack-internal") &&
+		(argv[0] === "discord-internal" || argv[0] === "slack-internal" || argv[0] === "feishu-app-internal") &&
 		!isDaemonInternalArgv(argv)
 	)
 		issue("unknown-path", "Private daemon worker arguments are invalid.");
@@ -300,7 +300,7 @@ export function isDaemonInternalArgv(argv: readonly string[]): boolean {
 	const ownerId = argv[2];
 	return (
 		argv.length === 5 &&
-		(argv[0] === "discord-internal" || argv[0] === "slack-internal") &&
+		(argv[0] === "discord-internal" || argv[0] === "slack-internal" || argv[0] === "feishu-app-internal") &&
 		argv[1] === "--owner-id" &&
 		typeof ownerId === "string" &&
 		ownerId.length > 0 &&

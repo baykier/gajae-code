@@ -25,7 +25,7 @@ import { runChatDaemonInternal } from "../sdk/bus/chat-daemon-cli";
 import { PublicCommandFailure, type PublicDaemonTargetOutcome } from "./public-command-errors";
 
 export type DaemonCliAction = "list" | "status" | "stop" | "restart";
-export type DaemonInternalCliAction = "discord-internal" | "slack-internal";
+export type DaemonInternalCliAction = "discord-internal" | "slack-internal" | "feishu-app-internal";
 export type DaemonCommandAction = DaemonCliAction | DaemonInternalCliAction;
 
 export class UnknownDaemonKindError extends PublicCommandFailure {
@@ -39,7 +39,7 @@ export class UnknownDaemonKindError extends PublicCommandFailure {
 }
 
 export function isDaemonInternalAction(action: DaemonCommandAction): action is DaemonInternalCliAction {
-	return action === "discord-internal" || action === "slack-internal";
+	return action === "discord-internal" || action === "slack-internal" || action === "feishu-app-internal";
 }
 
 export interface DaemonCommandArgs {
@@ -66,7 +66,7 @@ export interface DaemonCommandDeps {
 	setExitCode?: (code: number) => void;
 }
 
-const INTERNAL_ACTIONS: DaemonInternalCliAction[] = ["discord-internal", "slack-internal"];
+const INTERNAL_ACTIONS: DaemonInternalCliAction[] = ["discord-internal", "slack-internal", "feishu-app-internal"];
 const KNOWN_KINDS = BUILT_IN_DAEMON_KINDS;
 
 export function parseDaemonArgs(argv: string[]): DaemonCommandArgs | undefined {
@@ -129,7 +129,10 @@ export async function runDaemonCommand(cmd: DaemonCommandArgs, deps: DaemonComma
 			...(cmd.ownerId ? ["--owner-id", cmd.ownerId] : []),
 			...(cmd.agentDir ? ["--agent-dir", cmd.agentDir] : []),
 		];
-		await runChatDaemonInternal(cmd.action === "discord-internal" ? "discord" : "slack", args);
+		await runChatDaemonInternal(
+			cmd.action === "discord-internal" ? "discord" : cmd.action === "slack-internal" ? "slack" : "feishu-app",
+			args,
+		);
 		return;
 	}
 	const unknownKinds = cmd.kinds.filter(kind => !(KNOWN_KINDS as readonly string[]).includes(kind));

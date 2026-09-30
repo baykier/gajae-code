@@ -9,12 +9,18 @@ import { type ChatDaemonControlDeps, ChatDaemonController } from "../sdk/bus/cha
 import { type TelegramDaemonControlDeps, TelegramDaemonController } from "../sdk/bus/telegram-daemon-control";
 import type { BuiltInDaemonController, DaemonKind } from "./control-types";
 
-export const BUILT_IN_DAEMON_KINDS = ["telegram", "discord", "slack"] as const satisfies readonly DaemonKind[];
+export const BUILT_IN_DAEMON_KINDS = [
+	"telegram",
+	"discord",
+	"slack",
+	"feishu-app",
+] as const satisfies readonly DaemonKind[];
 
 export interface BuiltInDaemonControllerDeps {
 	telegram?: TelegramDaemonControlDeps;
 	discord?: ChatDaemonControlDeps;
 	slack?: ChatDaemonControlDeps;
+	feishuApp?: ChatDaemonControlDeps;
 }
 
 export function createBuiltInDaemonControllers(
@@ -25,6 +31,7 @@ export function createBuiltInDaemonControllers(
 		telegram: new TelegramDaemonController(settings, deps.telegram),
 		discord: new ChatDaemonController(settings, "discord", deps.discord),
 		slack: new ChatDaemonController(settings, "slack", deps.slack),
+		"feishu-app": new ChatDaemonController(settings, "feishu-app", deps.feishuApp),
 	};
 }
 

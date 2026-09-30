@@ -1,4 +1,4 @@
-export const ADAPTERS = ["telegram", "discord", "slack", "mcp", "acp", "daemonCli"] as const;
+export const ADAPTERS = ["telegram", "discord", "slack", "feishu-app", "mcp", "acp", "daemonCli"] as const;
 
 export type Adapter = (typeof ADAPTERS)[number];
 export type AdapterDisposition = "native_alias" | "generic_safe" | "machine_only" | "provider_only" | "prohibited";
@@ -60,6 +60,7 @@ const genericSafe: Record<Adapter, AdapterDisposition> = {
 	telegram: "generic_safe",
 	discord: "generic_safe",
 	slack: "generic_safe",
+	"feishu-app": "generic_safe",
 	mcp: "generic_safe",
 	acp: "generic_safe",
 	daemonCli: "generic_safe",
@@ -235,16 +236,24 @@ function controlDisposition(id: string): Record<Adapter, AdapterDisposition> {
 			telegram: "prohibited",
 			discord: "prohibited",
 			slack: "prohibited",
+			"feishu-app": "prohibited",
 			mcp: "prohibited",
 			acp: "prohibited",
 			daemonCli: "prohibited",
 		});
-	if (id === "C52") return dispositions({ telegram: "prohibited", discord: "prohibited", slack: "prohibited" });
+	if (id === "C52")
+		return dispositions({
+			telegram: "prohibited",
+			discord: "prohibited",
+			slack: "prohibited",
+			"feishu-app": "prohibited",
+		});
 	if (id === "C38")
 		return dispositions({
 			telegram: "prohibited",
 			discord: "prohibited",
 			slack: "prohibited",
+			"feishu-app": "prohibited",
 			mcp: "prohibited",
 			acp: "provider_only",
 			daemonCli: "machine_only",
@@ -254,6 +263,7 @@ function controlDisposition(id: string): Record<Adapter, AdapterDisposition> {
 			telegram: "prohibited",
 			discord: "prohibited",
 			slack: "prohibited",
+			"feishu-app": "prohibited",
 			mcp: "prohibited",
 			acp: "provider_only",
 			daemonCli: "prohibited",
@@ -312,7 +322,12 @@ function queryContinuityClass(id: string): QueryContinuityClass {
 
 function queryDisposition(id: string): Record<Adapter, AdapterDisposition> {
 	if (["Q23", "Q24", "Q25", "Q26", "Q27", "Q29", "Q30", "Q31"].includes(id))
-		return dispositions({ telegram: "prohibited", discord: "prohibited", slack: "prohibited" });
+		return dispositions({
+			telegram: "prohibited",
+			discord: "prohibited",
+			slack: "prohibited",
+			"feishu-app": "prohibited",
+		});
 	return dispositions();
 }
 
@@ -357,6 +372,7 @@ export const OPERATIONS: readonly Operation[] = [
 							telegram: "prohibited",
 							discord: "prohibited",
 							slack: "prohibited",
+							"feishu-app": "prohibited",
 							mcp: "prohibited",
 							acp: "machine_only",
 							daemonCli: "machine_only",
@@ -366,6 +382,7 @@ export const OPERATIONS: readonly Operation[] = [
 								telegram: "prohibited",
 								discord: "prohibited",
 								slack: "prohibited",
+								"feishu-app": "prohibited",
 								mcp: "prohibited",
 								acp: "prohibited",
 								daemonCli: "generic_safe",
@@ -375,12 +392,18 @@ export const OPERATIONS: readonly Operation[] = [
 									telegram: "prohibited",
 									discord: "prohibited",
 									slack: "prohibited",
+									"feishu-app": "prohibited",
 									mcp: "prohibited",
 									acp: "prohibited",
 									daemonCli: "prohibited",
 								})
 							: ["G03", "G04", "G05", "G06", "G07", "G08"].includes(id)
-								? dispositions({ telegram: "prohibited", discord: "prohibited", slack: "prohibited" })
+								? dispositions({
+										telegram: "prohibited",
+										discord: "prohibited",
+										slack: "prohibited",
+										"feishu-app": "prohibited",
+									})
 								: dispositions(),
 			testIds: ["packages/coding-agent/test/sdk-operation-inventory.test.ts"],
 		};
@@ -416,6 +439,7 @@ export const OPERATIONS: readonly Operation[] = [
 			telegram: "prohibited",
 			discord: "prohibited",
 			slack: "prohibited",
+			"feishu-app": "prohibited",
 			mcp: "prohibited",
 			acp: "provider_only",
 			daemonCli: "machine_only",

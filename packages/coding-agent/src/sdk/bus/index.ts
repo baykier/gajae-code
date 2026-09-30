@@ -161,6 +161,7 @@ import { ensureDiscordDaemon, ensureSlackDaemon } from "./chat-daemon-control";
 import {
 	getCurrentTelegramActivationMarker,
 	getNotificationConfig,
+	isFeishuComplete,
 	isProviderEffectivelyEnabled,
 	isSlackComplete,
 	isTelegramSessionEligible,
@@ -181,6 +182,7 @@ import {
 	EXISTING_THREAD_BIND_ENV,
 	isExistingThreadBindingRequested,
 } from "./existing-thread-readiness";
+import { createFeishuWebhookSink, type FeishuWebhookSink } from "./feishu-webhook";
 import { imageAttachmentsFromMessage, notificationActionPayload, summaryFromMessage, truncate } from "./helpers";
 import {
 	createKindAwareReconciliation,
@@ -1254,6 +1256,8 @@ interface SessionRuntime {
 	disposeGateListener: () => void;
 	/** Whether notification-only delivery and answer resources are active. */
 	notificationsActive: boolean;
+	/** Stateless Feishu webhook delivery; absent unless Feishu is configured and effective. */
+	feishu?: FeishuWebhookSink;
 	/** Provider ownership state is independent from the already-published core SDK runtime. */
 	notificationOwnerState: "ready" | "retry" | "blocked";
 	/**
@@ -1484,11 +1488,16 @@ function emitSessionEventWithReceipts(
 }
 
 function pushSessionFrame(
-	runtime: Pick<SessionRuntime, "server" | "host" | "broadcastEventFrame">,
+	runtime: Pick<SessionRuntime, "server" | "host" | "broadcastEventFrame" | "feishu">,
 	frame: { type: string; [key: string]: unknown },
 ): boolean {
 	const positionedRecipients = emitSessionEvent(runtime, frame);
 	if (frame.type === "turn_stream") {
+		// Feishu is push-only with no inbound answer surface: publish only settled
+		// final answers, never ask lead-ins or live narration.
+		if (frame.phase === "finalized" && frame.finalAnswer === true) {
+			runtime.feishu?.publish(String(frame.sessionId), String(frame.text));
+		}
 		const rawAccepted = runtime.server.pushTurnStreamUnchecked(
 			String(frame.sessionId),
 			frame.phase === "live" ? "live" : "finalized",
@@ -1568,6 +1577,16 @@ const defaultConfig: NotificationConfig = {
 		channelId: undefined,
 	},
 	redact: false,
+	feishu: {
+		webhookUrl: undefined,
+		secret: undefined,
+	},
+	"feishu-app": {
+		appId: undefined,
+		appSecret: undefined,
+		chatId: undefined,
+		authorizedOpenIds: undefined,
+	},
 	verbosity: "lean",
 	sessionScope: "all",
 	sound: "all",
@@ -8749,6 +8768,18 @@ export function createNotificationsExtension(
 						return { ok: false, error: e instanceof Error ? e.message : String(e) };
 					}
 				});
+				// Feishu needs no daemon: the sink ships settled answers straight to the
+				// group webhook. The policy gate is re-checked per publication, so
+				// redaction and `/notify off` stop delivery without a session restart.
+				const feishuCfg = resolveSettings(options.settings).cfg;
+				runtime.feishu =
+					feishuCfg.enabled && isFeishuComplete(feishuCfg) && isProviderEffectivelyEnabled(feishuCfg, "feishu")
+						? createFeishuWebhookSink({
+								webhookUrl: feishuCfg.feishu.webhookUrl,
+								secret: feishuCfg.feishu.secret,
+								canDeliver: () => canDeliverAsync(runtime, runtime.policyGeneration),
+							})
+						: undefined;
 			};
 			const activeRuntime = initializedRuntime;
 			// A native terminal close (SIGHUP), SIGTERM, Ctrl+C exit, or fatal error

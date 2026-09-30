@@ -178,16 +178,27 @@ async function runNotifyDaemonInternalFastPath(argv: string[]): Promise<void> {
 }
 
 function isChatDaemonInternalFastPath(argv: string[]): boolean {
-	return argv[0] === "daemon" && (argv[1] === "discord-internal" || argv[1] === "slack-internal");
+	return (
+		argv[0] === "daemon" &&
+		(argv[1] === "discord-internal" || argv[1] === "slack-internal" || argv[1] === "feishu-app-internal")
+	);
 }
 
 async function runChatDaemonInternalFastPath(argv: string[]): Promise<void> {
 	const action = argv[1];
-	if (action !== "discord-internal" && action !== "slack-internal") {
+	const kind =
+		action === "discord-internal"
+			? "discord"
+			: action === "slack-internal"
+				? "slack"
+				: action === "feishu-app-internal"
+					? "feishu-app"
+					: undefined;
+	if (kind === undefined) {
 		throw new Error("invalid chat daemon internal fast path");
 	}
 	const { runChatDaemonInternal } = await import("./sdk/bus/chat-daemon-cli");
-	await runChatDaemonInternal(action === "discord-internal" ? "discord" : "slack", argv.slice(2));
+	await runChatDaemonInternal(kind, argv.slice(2));
 }
 
 type MemoryGuardNativeSmokeLoad = () => Record<string, unknown>;

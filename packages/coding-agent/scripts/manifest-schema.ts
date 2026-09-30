@@ -10,7 +10,7 @@ export type ManifestExclusion = {
 export type ManifestAdapterRow = {
 	adapterTestId: string;
 	sdkId: string;
-	adapter: "telegram" | "discord" | "slack" | "mcp" | "acp" | "daemonCli";
+	adapter: "telegram" | "discord" | "slack" | "feishu-app" | "mcp" | "acp" | "daemonCli";
 	disposition: "native_alias" | "generic_safe" | "machine_only" | "provider_only" | "prohibited";
 	testFile: string;
 	testNamePattern: string;
@@ -76,7 +76,7 @@ export function validateManifest(value: unknown): Manifest {
 	}
 
 	const rows: unknown[] = "rows" in value && Array.isArray(value.rows) ? value.rows : [];
-	const adapters = new Set(["telegram", "discord", "slack", "mcp", "acp", "daemonCli"]);
+	const adapters = new Set(["telegram", "discord", "slack", "feishu-app", "mcp", "acp", "daemonCli"]);
 	const dispositions = new Set(["native_alias", "generic_safe", "machine_only", "provider_only", "prohibited"]);
 	const expected = new Set(["forwarded", "rejected_before_send", "internal_only"]);
 	for (const [index, row] of rows.entries()) {

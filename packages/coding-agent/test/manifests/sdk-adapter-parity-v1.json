@@ -49,7 +49,7 @@
 				"test",
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
-				"^AD-(T|D|S)-"
+				"^AD-(T|D|S|F)-"
 			]
 		},
 		{
@@ -153,6 +153,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C01",
+			"sdkId": "turn.prompt",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C01",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C01:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C01",
 			"sdkId": "turn.prompt",
 			"adapter": "mcp",
@@ -245,6 +261,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C02:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C02",
+			"sdkId": "turn.steer",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C02",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C02:"
 			],
 			"expected": "forwarded"
 		},
@@ -345,6 +377,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C03",
+			"sdkId": "turn.follow_up",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C03",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C03:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C03",
 			"sdkId": "turn.follow_up",
 			"adapter": "mcp",
@@ -437,6 +485,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C04:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C04",
+			"sdkId": "turn.abort",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C04",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C04:"
 			],
 			"expected": "forwarded"
 		},
@@ -537,6 +601,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C05",
+			"sdkId": "turn.abort_and_prompt",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C05",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C05:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C05",
 			"sdkId": "turn.abort_and_prompt",
 			"adapter": "mcp",
@@ -629,6 +709,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C06:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C06",
+			"sdkId": "ask.answer",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C06",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C06:"
 			],
 			"expected": "forwarded"
 		},
@@ -729,6 +825,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C07",
+			"sdkId": "workflow.gate_answer",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C07",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C07:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C07",
 			"sdkId": "workflow.gate_answer",
 			"adapter": "mcp",
@@ -821,6 +933,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C08:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C08",
+			"sdkId": "workflow.plan_approve",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C08",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C08:"
 			],
 			"expected": "forwarded"
 		},
@@ -921,6 +1049,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C09",
+			"sdkId": "skill.invoke",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C09",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C09:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C09",
 			"sdkId": "skill.invoke",
 			"adapter": "mcp",
@@ -1013,6 +1157,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C10:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C10",
+			"sdkId": "mode.plan.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C10",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C10:"
 			],
 			"expected": "forwarded"
 		},
@@ -1113,6 +1273,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C11",
+			"sdkId": "mode.goal.operate",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C11",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C11:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C11",
 			"sdkId": "mode.goal.operate",
 			"adapter": "mcp",
@@ -1205,6 +1381,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C12:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C12",
+			"sdkId": "todo.replace",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C12",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C12:"
 			],
 			"expected": "forwarded"
 		},
@@ -1305,6 +1497,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C13",
+			"sdkId": "model.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C13",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C13:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C13",
 			"sdkId": "model.set",
 			"adapter": "mcp",
@@ -1397,6 +1605,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C14:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C14",
+			"sdkId": "model.cycle",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C14",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C14:"
 			],
 			"expected": "forwarded"
 		},
@@ -1497,6 +1721,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C15",
+			"sdkId": "thinking.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C15",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C15:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C15",
 			"sdkId": "thinking.set",
 			"adapter": "mcp",
@@ -1589,6 +1829,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C16:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C16",
+			"sdkId": "thinking.cycle",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C16",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C16:"
 			],
 			"expected": "forwarded"
 		},
@@ -1689,6 +1945,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C17",
+			"sdkId": "permission_mode.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C17",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C17:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C17",
 			"sdkId": "permission_mode.set",
 			"adapter": "mcp",
@@ -1781,6 +2053,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C18:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C18",
+			"sdkId": "queue.steering_mode.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C18",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C18:"
 			],
 			"expected": "forwarded"
 		},
@@ -1881,6 +2169,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C19",
+			"sdkId": "queue.follow_up_mode.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C19",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C19:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C19",
 			"sdkId": "queue.follow_up_mode.set",
 			"adapter": "mcp",
@@ -1973,6 +2277,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C20:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C20",
+			"sdkId": "queue.tool_interrupt_policy.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C20",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C20:"
 			],
 			"expected": "forwarded"
 		},
@@ -2073,6 +2393,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C21",
+			"sdkId": "compaction.run",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C21",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C21:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C21",
 			"sdkId": "compaction.run",
 			"adapter": "mcp",
@@ -2165,6 +2501,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C22:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C22",
+			"sdkId": "compaction.auto.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C22",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C22:"
 			],
 			"expected": "forwarded"
 		},
@@ -2265,6 +2617,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C23",
+			"sdkId": "retry.auto.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C23",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C23:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C23",
 			"sdkId": "retry.auto.set",
 			"adapter": "mcp",
@@ -2357,6 +2725,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C24:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C24",
+			"sdkId": "retry.abort",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C24",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C24:"
 			],
 			"expected": "forwarded"
 		},
@@ -2457,6 +2841,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-C25",
+			"sdkId": "bash.execute",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C25",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C25:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-C25",
 			"sdkId": "bash.execute",
 			"adapter": "mcp",
@@ -2549,6 +2949,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C26:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-C26",
+			"sdkId": "bash.abort",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C26",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C26:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -2649,6 +3065,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-C27",
+			"sdkId": "session.new",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C27",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C27:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-C27",
 			"sdkId": "session.new",
 			"adapter": "mcp",
@@ -2741,6 +3173,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C28:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-C28",
+			"sdkId": "session.fork",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C28",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C28:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -2841,6 +3289,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-C29",
+			"sdkId": "session.resume",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C29",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C29:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-C29",
 			"sdkId": "session.resume",
 			"adapter": "mcp",
@@ -2933,6 +3397,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C30:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-C30",
+			"sdkId": "session.close",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C30",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C30:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -3033,6 +3513,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-C31",
+			"sdkId": "session.switch",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C31",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C31:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-C31",
 			"sdkId": "session.switch",
 			"adapter": "mcp",
@@ -3125,6 +3621,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C32:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-C32",
+			"sdkId": "session.branch",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C32",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C32:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -3225,6 +3737,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C33",
+			"sdkId": "session.rename",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C33",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C33:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C33",
 			"sdkId": "session.rename",
 			"adapter": "mcp",
@@ -3321,6 +3849,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-C34",
+			"sdkId": "session.handoff",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C34",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C34:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-C34",
 			"sdkId": "session.handoff",
 			"adapter": "mcp",
@@ -3413,6 +3957,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C35:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C35",
+			"sdkId": "session.export_html",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C35",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C35:"
 			],
 			"expected": "forwarded"
 		},
@@ -3561,6 +4121,38 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-C36",
+			"sdkId": "config.patch",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C36",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C36:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C36-secret",
+			"sdkId": "config.patch",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C36-secret",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C36-secret:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-C36",
 			"sdkId": "config.patch",
 			"adapter": "mcp",
@@ -3705,6 +4297,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C37",
+			"sdkId": "runtime.reload",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C37",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C37:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C37",
 			"sdkId": "runtime.reload",
 			"adapter": "mcp",
@@ -3797,6 +4405,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C38:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-C38",
+			"sdkId": "auth.login",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C38",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C38:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -3897,6 +4521,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-C39",
+			"sdkId": "host_tools.register",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C39",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C39:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-C39",
 			"sdkId": "host_tools.register",
 			"adapter": "mcp",
@@ -3989,6 +4629,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C40:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-C40",
+			"sdkId": "host_uri.register",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C40",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C40:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -4089,6 +4745,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C41",
+			"sdkId": "service_tier.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C41",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C41:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C41",
 			"sdkId": "service_tier.set",
 			"adapter": "mcp",
@@ -4181,6 +4853,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C42:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C42",
+			"sdkId": "tools.active.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C42",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C42:"
 			],
 			"expected": "forwarded"
 		},
@@ -4281,6 +4969,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C43",
+			"sdkId": "queue.message.remove",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C43",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C43:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C43",
 			"sdkId": "queue.message.remove",
 			"adapter": "mcp",
@@ -4373,6 +5077,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C44:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C44",
+			"sdkId": "queue.message.move",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C44",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C44:"
 			],
 			"expected": "forwarded"
 		},
@@ -4473,6 +5193,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C45",
+			"sdkId": "queue.message.update",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C45",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C45:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C45",
 			"sdkId": "queue.message.update",
 			"adapter": "mcp",
@@ -4565,6 +5301,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C46:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C46",
+			"sdkId": "extension.set_enabled",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C46",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C46:"
 			],
 			"expected": "forwarded"
 		},
@@ -4665,6 +5417,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C47",
+			"sdkId": "context.clear",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C47",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C47:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C47",
 			"sdkId": "context.clear",
 			"adapter": "mcp",
@@ -4757,6 +5525,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C48:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-C48",
+			"sdkId": "session.delete",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C48",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C48:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -4857,6 +5641,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C49",
+			"sdkId": "session.cwd.move",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C49",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C49:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C49",
 			"sdkId": "session.cwd.move",
 			"adapter": "mcp",
@@ -4949,6 +5749,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C50:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-C50",
+			"sdkId": "retry.last",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C50",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C50:"
 			],
 			"expected": "forwarded"
 		},
@@ -5049,6 +5865,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C51",
+			"sdkId": "retry.now",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C51",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C51:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C51",
 			"sdkId": "retry.now",
 			"adapter": "mcp",
@@ -5141,6 +5973,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-C52:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-C52",
+			"sdkId": "bash.background",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C52",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C52:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -5241,6 +6089,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-C53",
+			"sdkId": "model.profile.set",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-C53",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-C53:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-C53",
 			"sdkId": "model.profile.set",
 			"adapter": "mcp",
@@ -5333,6 +6197,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-G01:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-G01",
+			"sdkId": "session.list",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G01",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G01:"
 			],
 			"expected": "forwarded"
 		},
@@ -5433,6 +6313,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-G02",
+			"sdkId": "session.get_endpoint",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G02",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G02:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-G02",
 			"sdkId": "session.get_endpoint",
 			"adapter": "mcp",
@@ -5525,6 +6421,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-G03:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-G03",
+			"sdkId": "session.create",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G03",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G03:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -5625,6 +6537,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-G04",
+			"sdkId": "session.fork",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G04",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G04:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-G04",
 			"sdkId": "session.fork",
 			"adapter": "mcp",
@@ -5717,6 +6645,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-G05:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-G05",
+			"sdkId": "session.resume",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G05",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G05:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -5817,6 +6761,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-G06",
+			"sdkId": "session.close",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G06",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G06:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-G06",
 			"sdkId": "session.close",
 			"adapter": "mcp",
@@ -5909,6 +6869,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-G07:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-G07",
+			"sdkId": "session.delete",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G07",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G07:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -6009,6 +6985,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-G08",
+			"sdkId": "session.reconcile_uncertain",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G08",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G08:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-G08",
 			"sdkId": "session.reconcile_uncertain",
 			"adapter": "mcp",
@@ -6101,6 +7093,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-G09:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-G09",
+			"sdkId": "session.spawn",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G09",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G09:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -6201,6 +7209,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-G10",
+			"sdkId": "session.lookup",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-G10",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-G10:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-G10",
 			"sdkId": "session.lookup",
 			"adapter": "mcp",
@@ -6293,6 +7317,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q01:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q01",
+			"sdkId": "transcript.list",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q01",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q01:"
 			],
 			"expected": "forwarded"
 		},
@@ -6393,6 +7433,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q02",
+			"sdkId": "transcript.body",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q02",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q02:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q02",
 			"sdkId": "transcript.body",
 			"adapter": "mcp",
@@ -6485,6 +7541,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q03:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q03",
+			"sdkId": "context.get",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q03",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q03:"
 			],
 			"expected": "forwarded"
 		},
@@ -6585,6 +7657,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q04",
+			"sdkId": "goal.list/get",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q04",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q04:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q04",
 			"sdkId": "goal.list/get",
 			"adapter": "mcp",
@@ -6677,6 +7765,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q05:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q05",
+			"sdkId": "todo.list",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q05",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q05:"
 			],
 			"expected": "forwarded"
 		},
@@ -6777,6 +7881,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q06",
+			"sdkId": "diff.list_files",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q06",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q06:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q06",
 			"sdkId": "diff.list_files",
 			"adapter": "mcp",
@@ -6869,6 +7989,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q07:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q07",
+			"sdkId": "diff.list_hunks",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q07",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q07:"
 			],
 			"expected": "forwarded"
 		},
@@ -6969,6 +8105,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q08",
+			"sdkId": "diff.read_hunk",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q08",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q08:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q08",
 			"sdkId": "diff.read_hunk",
 			"adapter": "mcp",
@@ -7061,6 +8213,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q09:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q09",
+			"sdkId": "usage.get",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q09",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q09:"
 			],
 			"expected": "forwarded"
 		},
@@ -7161,6 +8329,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q10",
+			"sdkId": "models.list/current",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q10",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q10:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q10",
 			"sdkId": "models.list/current",
 			"adapter": "mcp",
@@ -7253,6 +8437,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q11:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q11",
+			"sdkId": "skill.list/state",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q11",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q11:"
 			],
 			"expected": "forwarded"
 		},
@@ -7353,6 +8553,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q12",
+			"sdkId": "workflow.gates.list",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q12",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q12:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q12",
 			"sdkId": "workflow.gates.list",
 			"adapter": "mcp",
@@ -7445,6 +8661,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q13:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q13",
+			"sdkId": "config.list/get",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q13",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q13:"
 			],
 			"expected": "forwarded"
 		},
@@ -7545,6 +8777,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q14",
+			"sdkId": "session.metadata",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q14",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q14:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q14",
 			"sdkId": "session.metadata",
 			"adapter": "mcp",
@@ -7637,6 +8885,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q15:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q15",
+			"sdkId": "session.stats",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q15",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q15:"
 			],
 			"expected": "forwarded"
 		},
@@ -7737,6 +9001,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q16",
+			"sdkId": "session.branch_candidates",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q16",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q16:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q16",
 			"sdkId": "session.branch_candidates",
 			"adapter": "mcp",
@@ -7829,6 +9109,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q17:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q17",
+			"sdkId": "session.last_assistant",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q17",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q17:"
 			],
 			"expected": "forwarded"
 		},
@@ -7929,6 +9225,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q18",
+			"sdkId": "runtime.capabilities",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q18",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q18:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q18",
 			"sdkId": "runtime.capabilities",
 			"adapter": "mcp",
@@ -8021,6 +9333,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q19:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q19",
+			"sdkId": "auth.providers",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q19",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q19:"
 			],
 			"expected": "forwarded"
 		},
@@ -8121,6 +9449,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q20",
+			"sdkId": "tools.list",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q20",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q20:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q20",
 			"sdkId": "tools.list",
 			"adapter": "mcp",
@@ -8213,6 +9557,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q21:"
+			],
+			"expected": "forwarded"
+		},
+		{
+			"adapterTestId": "AD-F-Q21",
+			"sdkId": "queue.messages.list",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q21",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q21:"
 			],
 			"expected": "forwarded"
 		},
@@ -8313,6 +9673,22 @@
 			"expected": "forwarded"
 		},
 		{
+			"adapterTestId": "AD-F-Q22",
+			"sdkId": "extensions.list",
+			"adapter": "feishu-app",
+			"disposition": "generic_safe",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q22",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q22:"
+			],
+			"expected": "forwarded"
+		},
+		{
 			"adapterTestId": "AD-M-Q22",
 			"sdkId": "extensions.list",
 			"adapter": "mcp",
@@ -8405,6 +9781,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q23:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-Q23",
+			"sdkId": "resource.body",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q23",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q23:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -8505,6 +9897,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-Q24",
+			"sdkId": "artifact.read",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q24",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q24:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-Q24",
 			"sdkId": "artifact.read",
 			"adapter": "mcp",
@@ -8597,6 +10005,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q25:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-Q25",
+			"sdkId": "runtime.jobs.list",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q25",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q25:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -8697,6 +10121,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-Q26",
+			"sdkId": "turn.result",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q26",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q26:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-Q26",
 			"sdkId": "turn.result",
 			"adapter": "mcp",
@@ -8789,6 +10229,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q27:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-Q27",
+			"sdkId": "models.profiles.list",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q27",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q27:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -8889,6 +10345,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-Q29",
+			"sdkId": "providers.list/active",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q29",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q29:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-Q29",
 			"sdkId": "providers.list/active",
 			"adapter": "mcp",
@@ -8981,6 +10453,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-Q30:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-Q30",
+			"sdkId": "session.checkpoint",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q30",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q30:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -9081,6 +10569,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-Q31",
+			"sdkId": "turn.steer_status",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-Q31",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-Q31:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-Q31",
 			"sdkId": "turn.steer_status",
 			"adapter": "mcp",
@@ -9173,6 +10677,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-R01:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-R01",
+			"sdkId": "terminal.create/output/release/wait",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-R01",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-R01:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -9273,6 +10793,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-R02",
+			"sdkId": "filesystem.read/write",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-R02",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-R02:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-R02",
 			"sdkId": "filesystem.read/write",
 			"adapter": "mcp",
@@ -9365,6 +10901,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-R03:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-R03",
+			"sdkId": "permission.request",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-R03",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-R03:"
 			],
 			"expected": "rejected_before_send"
 		},
@@ -9465,6 +11017,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-R04",
+			"sdkId": "ui.select/confirm/input/editor/open_url",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-R04",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-R04:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-R04",
 			"sdkId": "ui.select/confirm/input/editor/open_url",
 			"adapter": "mcp",
@@ -9561,6 +11129,22 @@
 			"expected": "rejected_before_send"
 		},
 		{
+			"adapterTestId": "AD-F-R05",
+			"sdkId": "host_tool.invoke/cancel/update/result",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-R05",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-R05:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
 			"adapterTestId": "AD-M-R05",
 			"sdkId": "host_tool.invoke/cancel/update/result",
 			"adapter": "mcp",
@@ -9653,6 +11237,22 @@
 				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
 				"--test-name-pattern",
 				"^AD-S-R06:"
+			],
+			"expected": "rejected_before_send"
+		},
+		{
+			"adapterTestId": "AD-F-R06",
+			"sdkId": "host_uri.read/write/cancel/result",
+			"adapter": "feishu-app",
+			"disposition": "prohibited",
+			"testFile": "packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+			"testNamePattern": "AD-F-R06",
+			"argv": [
+				"bun",
+				"test",
+				"packages/coding-agent/test/sdk-adapter-dispositions.test.ts",
+				"--test-name-pattern",
+				"^AD-F-R06:"
 			],
 			"expected": "rejected_before_send"
 		},

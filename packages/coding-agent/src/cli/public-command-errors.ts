@@ -27,7 +27,7 @@ export type PublicFailureKind =
 	| "internal";
 export type PublicEffectProof = "pre-send" | "pre-effect" | "accepted" | "completed" | "sent" | "unknown";
 export interface PublicDaemonTargetOutcome {
-	kind: "telegram" | "discord" | "slack";
+	kind: "telegram" | "discord" | "slack" | "feishu-app";
 	outcome: "not-applied" | "applied" | "unknown";
 }
 export interface PublicCommandFailureInput {
@@ -71,7 +71,7 @@ export interface ClassifiedPublicCommandFailure extends EvidenceClassification {
 }
 /** Bounded projection of a completed daemon operation result for failure envelopes. */
 export interface PublicDaemonOperationResult {
-	kind: "telegram" | "discord" | "slack";
+	kind: "telegram" | "discord" | "slack" | "feishu-app";
 	action: DaemonOperationResult["action"];
 	ok: boolean;
 	before?: DaemonStatus;

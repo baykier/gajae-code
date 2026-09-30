@@ -27,11 +27,17 @@ import type {
 import { resolveGjcRuntimeSpawnInfo } from "../../daemon/runtime";
 import { isProcessIncarnation, processIncarnation } from "../broker/process-incarnation";
 import { CHAT_DAEMON_DIRECTORY, CHAT_DAEMON_FILES, canonicalServiceRootDigest } from "../service-artifact-paths";
-import { getNotificationConfig, isDiscordComplete, isProviderEffectivelyEnabled, isSlackComplete } from "./config";
+import {
+	getNotificationConfig,
+	isDiscordComplete,
+	isFeishuAppComplete,
+	isProviderEffectivelyEnabled,
+	isSlackComplete,
+} from "./config";
 import { withDaemonStartupExclusion } from "./daemon-startup-exclusion";
 import { type DoctorDaemonControlRequest, isDoctorDaemonControlRequest } from "./doctor-daemon-restart";
 
-export type ChatDaemonKind = "discord" | "slack";
+export type ChatDaemonKind = "discord" | "slack" | "feishu-app";
 export type ChatDaemonAction = "stop" | "reload";
 
 /**
@@ -139,10 +145,13 @@ export type ChatDaemonAction = "stop" | "reload";
  * pre-upgrade owner cannot retain the queue race fixed by #5120.
  * Slack generation 80 persists and fences the inbound SDK dispatch boundary so
  * crashes, recovery, and attachment retirement cannot replay ambiguous work.
+ * Feishu-app generation 1 establishes the Feishu enterprise-app daemon lifecycle
+ * (WS long-connection inbound) on the shared chat-daemon control plane.
  */
 export const CHAT_DAEMON_GENERATIONS: Readonly<Record<ChatDaemonKind, number>> = {
 	discord: 81,
 	slack: 88,
+	"feishu-app": 1,
 };
 
 export function chatDaemonGeneration(kind: ChatDaemonKind): number {
@@ -191,7 +200,7 @@ function hasSafeChatDaemonOwnerShape(
 	const state = value as Record<string, unknown>;
 	return (
 		state.version === 1 &&
-		(state.kind === "discord" || state.kind === "slack") &&
+		(state.kind === "discord" || state.kind === "slack" || state.kind === "feishu-app") &&
 		typeof state.pid === "number" &&
 		Number.isSafeInteger(state.pid) &&
 		state.pid > 0 &&
@@ -244,7 +253,7 @@ function isExactPreUpgradeUnavailableChatDaemonState(
 		return false;
 	return (
 		state.version === 1 &&
-		(state.kind === "discord" || state.kind === "slack") &&
+		(state.kind === "discord" || state.kind === "slack" || state.kind === "feishu-app") &&
 		typeof state.pid === "number" &&
 		Number.isSafeInteger(state.pid) &&
 		state.pid > 0 &&
@@ -456,6 +465,17 @@ function identityFor(settings: Settings, kind: ChatDaemonKind): string | undefin
 			cfg.discord.applicationId,
 			cfg.discord.guildId,
 			cfg.discord.parentChannelId,
+			String(cfg.redact),
+			cfg.verbosity,
+		]);
+	}
+	if (kind === "feishu-app") {
+		if (!isFeishuAppComplete(cfg)) return undefined;
+		return fingerprint([
+			cfg["feishu-app"].appId,
+			cfg["feishu-app"].appSecret,
+			cfg["feishu-app"].chatId,
+			cfg["feishu-app"].authorizedOpenIds,
 			String(cfg.redact),
 			cfg.verbosity,
 		]);
@@ -1025,6 +1045,13 @@ export async function ensureSlackDaemon(
 	deps: ChatDaemonControlDeps = {},
 ): Promise<EnsureChatDaemonResult> {
 	return await ensureChatDaemon("slack", settings, deps);
+}
+
+export async function ensureFeishuAppDaemon(
+	settings: Settings,
+	deps: ChatDaemonControlDeps = {},
+): Promise<EnsureChatDaemonResult> {
+	return await ensureChatDaemon("feishu-app", settings, deps);
 }
 
 export interface AcquireChatDaemonOwnershipInput {

@@ -307,6 +307,42 @@
 					},
 					"additionalProperties": false
 				},
+				"feishu": {
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"type": "boolean"
+						},
+						"webhookUrl": {
+							"type": "string"
+						},
+						"secret": {
+							"type": "string"
+						}
+					},
+					"additionalProperties": false
+				},
+				"feishu-app": {
+					"type": "object",
+					"properties": {
+						"enabled": {
+							"type": "boolean"
+						},
+						"appId": {
+							"type": "string"
+						},
+						"appSecret": {
+							"type": "string"
+						},
+						"chatId": {
+							"type": "string"
+						},
+						"authorizedOpenIds": {
+							"type": "string"
+						}
+					},
+					"additionalProperties": false
+				},
 				"redact": {
 					"type": "boolean",
 					"description": "Redact sensitive content before notifications are delivered.",

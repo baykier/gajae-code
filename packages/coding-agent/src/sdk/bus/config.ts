@@ -62,7 +62,7 @@ export function readTelegramActivationMarkers(value?: unknown): TelegramActivati
 	return markers;
 }
 
-export type NotificationProvider = "telegram" | "discord" | "slack";
+export type NotificationProvider = "telegram" | "discord" | "slack" | "feishu" | "feishu-app";
 export type NotificationRuntime = "inactive" | "starting" | "ready" | "attached" | "blocked" | "failed";
 export type ProviderSecretDisposition = "keep" | "replace" | "remove";
 export type ProviderResolutionIssueCode = "missing" | "blank" | "wrong_type" | "invalid_container" | "contradictory";
@@ -84,7 +84,17 @@ export interface ProviderResolution {
 	effectiveEnabled: boolean;
 	issues: readonly ProviderResolutionIssue[];
 }
-const NOTIFICATION_PROVIDERS = ["telegram", "discord", "slack"] as const;
+/**
+ * "feishu" is the webhook-only provider: delivery is a stateless HTTP POST from
+ * the session process, so it has no daemon, no runtime state, and no inbound
+ * surface. See feishu-webhook.ts and docs/feishu-onboarding.md.
+ *
+ * "feishu-app" is the Feishu enterprise custom-app bot: a managed chat daemon
+ * (WebSocket long-connection inbound + im API outbound) providing the same
+ * conversation surface as discord/slack. See feishu-app-provider.ts and
+ * docs/feishu-app-onboarding.md.
+ */
+const NOTIFICATION_PROVIDERS = ["telegram", "discord", "slack", "feishu", "feishu-app"] as const;
 
 export interface NotificationSettingsSnapshot {
 	enabled: boolean;
@@ -115,6 +125,18 @@ export interface NotificationSettingsSnapshot {
 		workspaceId?: string;
 		channelId?: string;
 		authorizedUserId?: string;
+	};
+	feishu: {
+		enabled?: boolean;
+		webhookUrl?: string;
+		secret?: string;
+	};
+	"feishu-app": {
+		enabled?: boolean;
+		appId?: string;
+		appSecret?: string;
+		chatId?: string;
+		authorizedOpenIds?: string;
 	};
 	redact: boolean;
 	verbosity: "lean" | "verbose";
@@ -285,6 +307,7 @@ export function parseNotificationSettingsSnapshot(rawConfig?: unknown): Notifica
 	const telegram = providerObject(notifications.telegram, "notifications.telegram", telegramIssues);
 	const discord = providerObject(notifications.discord, "notifications.discord", discordIssues);
 	const slack = providerObject(notifications.slack, "notifications.slack", slackIssues);
+	const feishuIssues: ProviderResolutionIssue[] = [];
 	const btw = providerObject(telegram.btw, "notifications.telegram.btw", telegramIssues);
 	const rich = providerObject(telegram.rich, "notifications.telegram.rich", telegramIssues);
 	const richDraft = providerObject(telegram.richDraft, "notifications.telegram.richDraft", telegramIssues);
@@ -295,6 +318,11 @@ export function parseNotificationSettingsSnapshot(rawConfig?: unknown): Notifica
 	const telegramEnabled = providerEnabled(telegram, "notifications.telegram.enabled", telegramIssues);
 	const discordEnabled = providerEnabled(discord, "notifications.discord.enabled", discordIssues);
 	const slackEnabled = providerEnabled(slack, "notifications.slack.enabled", slackIssues);
+	const feishu = providerObject(notifications.feishu, "notifications.feishu", feishuIssues);
+	const feishuEnabled = providerEnabled(feishu, "notifications.feishu.enabled", feishuIssues);
+	const feishuAppIssues: ProviderResolutionIssue[] = [];
+	const feishuApp = providerObject(notifications["feishu-app"], "notifications.feishu-app", feishuAppIssues);
+	const feishuAppEnabled = providerEnabled(feishuApp, "notifications.feishu-app.enabled", feishuAppIssues);
 	addMissingRequiredProviderIssues(
 		telegram,
 		["botToken", "chatId"],
@@ -315,6 +343,20 @@ export function parseNotificationSettingsSnapshot(rawConfig?: unknown): Notifica
 		"notifications.slack",
 		slackIssues,
 		slackEnabled === true,
+	);
+	addMissingRequiredProviderIssues(
+		feishu,
+		["webhookUrl"],
+		"notifications.feishu",
+		feishuIssues,
+		feishuEnabled === true,
+	);
+	addMissingRequiredProviderIssues(
+		feishuApp,
+		["appId", "appSecret", "chatId", "authorizedOpenIds"],
+		"notifications.feishu-app",
+		feishuAppIssues,
+		feishuAppEnabled === true,
 	);
 	const telegramSnapshot: NotificationSettingsSnapshot["telegram"] = {
 		...(telegramEnabled === undefined ? {} : { enabled: telegramEnabled }),
@@ -380,16 +422,37 @@ export function parseNotificationSettingsSnapshot(rawConfig?: unknown): Notifica
 		channelId: providerString(slack, "channelId", "notifications.slack.channelId", slackIssues),
 		authorizedUserId: providerString(slack, "authorizedUserId", "notifications.slack.authorizedUserId", slackIssues),
 	};
+	const feishuSnapshot: NotificationSettingsSnapshot["feishu"] = {
+		...(feishuEnabled === undefined ? {} : { enabled: feishuEnabled }),
+		webhookUrl: providerString(feishu, "webhookUrl", "notifications.feishu.webhookUrl", feishuIssues),
+		secret: providerString(feishu, "secret", "notifications.feishu.secret", feishuIssues),
+	};
+	const feishuAppSnapshot: NotificationSettingsSnapshot["feishu-app"] = {
+		...(feishuAppEnabled === undefined ? {} : { enabled: feishuAppEnabled }),
+		appId: providerString(feishuApp, "appId", "notifications.feishu-app.appId", feishuAppIssues),
+		appSecret: providerString(feishuApp, "appSecret", "notifications.feishu-app.appSecret", feishuAppIssues),
+		chatId: providerString(feishuApp, "chatId", "notifications.feishu-app.chatId", feishuAppIssues),
+		authorizedOpenIds: providerString(
+			feishuApp,
+			"authorizedOpenIds",
+			"notifications.feishu-app.authorizedOpenIds",
+			feishuAppIssues,
+		),
+	};
 	const providerIssues: Partial<Record<NotificationProvider, readonly ProviderResolutionIssue[]>> = {
 		...(providerIssuesSnapshot("telegram", telegramIssues) ?? {}),
 		...(providerIssuesSnapshot("discord", discordIssues) ?? {}),
 		...(providerIssuesSnapshot("slack", slackIssues) ?? {}),
+		...(providerIssuesSnapshot("feishu", feishuIssues) ?? {}),
+		...(providerIssuesSnapshot("feishu-app", feishuAppIssues) ?? {}),
 	};
 	const snapshot: NotificationSettingsSnapshot = {
 		enabled: notificationGlobalBoolean(notifications.enabled, false),
 		telegram: telegramSnapshot,
 		discord: discordSnapshot,
 		slack: slackSnapshot,
+		feishu: feishuSnapshot,
+		"feishu-app": feishuAppSnapshot,
 		redact: notificationGlobalBoolean(notifications.redact, false),
 		verbosity: notificationGlobalChoice(notifications.verbosity, "lean", ["lean", "verbose"]),
 		sessionScope: notificationGlobalChoice(notifications.sessionScope, "all", ["all", "primary"]),
@@ -439,6 +502,18 @@ export interface NotificationConfig {
 		channelId?: string;
 		authorizedUserId?: string;
 	};
+	feishu: {
+		enabled?: boolean;
+		webhookUrl?: string;
+		secret?: string;
+	};
+	"feishu-app": {
+		enabled?: boolean;
+		appId?: string;
+		appSecret?: string;
+		chatId?: string;
+		authorizedOpenIds?: string;
+	};
 	redact: boolean;
 	verbosity: "lean" | "verbose";
 	sessionScope: "all" | "primary";
@@ -475,6 +550,18 @@ function notificationConfigFromSnapshot(snapshot: NotificationSettingsSnapshot):
 			workspaceId: snapshot.slack.workspaceId,
 			channelId: snapshot.slack.channelId,
 			authorizedUserId: snapshot.slack.authorizedUserId,
+		},
+		feishu: {
+			...(snapshot.feishu.enabled === undefined ? {} : { enabled: snapshot.feishu.enabled }),
+			webhookUrl: snapshot.feishu.webhookUrl,
+			secret: snapshot.feishu.secret,
+		},
+		"feishu-app": {
+			...(snapshot["feishu-app"].enabled === undefined ? {} : { enabled: snapshot["feishu-app"].enabled }),
+			appId: snapshot["feishu-app"].appId,
+			appSecret: snapshot["feishu-app"].appSecret,
+			chatId: snapshot["feishu-app"].chatId,
+			authorizedOpenIds: snapshot["feishu-app"].authorizedOpenIds,
 		},
 		redact: snapshot.redact,
 		verbosity: snapshot.verbosity,
@@ -526,6 +613,15 @@ function providerRequiredFields(
 			parentChannelId: cfg.discord.parentChannelId,
 		};
 	}
+	if (provider === "feishu") return { webhookUrl: cfg.feishu.webhookUrl };
+	if (provider === "feishu-app") {
+		return {
+			appId: cfg["feishu-app"].appId,
+			appSecret: cfg["feishu-app"].appSecret,
+			chatId: cfg["feishu-app"].chatId,
+			authorizedOpenIds: cfg["feishu-app"].authorizedOpenIds,
+		};
+	}
 	return {
 		botToken: cfg.slack.botToken,
 		appToken: cfg.slack.appToken,
@@ -538,12 +634,15 @@ function providerOptionalFields(
 	cfg: NotificationConfig,
 	provider: NotificationProvider,
 ): Readonly<Record<string, unknown>> {
+	if (provider === "feishu") return { secret: cfg.feishu.secret };
 	return provider === "slack" ? { authorizedUserId: cfg.slack.authorizedUserId } : {};
 }
 
 function providerConfigEnabled(cfg: NotificationConfig, provider: NotificationProvider): unknown {
 	if (provider === "telegram") return cfg.telegram?.enabled;
 	if (provider === "discord") return cfg.discord.enabled;
+	if (provider === "feishu") return cfg.feishu.enabled;
+	if (provider === "feishu-app") return cfg["feishu-app"].enabled;
 	return cfg.slack.enabled;
 }
 
@@ -615,6 +714,18 @@ export function isSlackComplete(cfg: NotificationConfig): cfg is NotificationCon
 	slack: { botToken: string; appToken: string; workspaceId: string; channelId: string };
 } {
 	return isProviderComplete(cfg, "slack");
+}
+
+export function isFeishuComplete(cfg: NotificationConfig): cfg is NotificationConfig & {
+	feishu: { webhookUrl: string };
+} {
+	return isProviderComplete(cfg, "feishu");
+}
+
+export function isFeishuAppComplete(cfg: NotificationConfig): cfg is NotificationConfig & {
+	"feishu-app": { appId: string; appSecret: string; chatId: string; authorizedOpenIds: string };
+} {
+	return isProviderComplete(cfg, "feishu-app");
 }
 
 export function resolveNotificationProvider(

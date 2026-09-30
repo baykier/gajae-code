@@ -35,7 +35,7 @@ import { acquireFileLock, type FileLockOptions, withFileLock } from "../../confi
 import { CHAT_DAEMON_DIRECTORY } from "../service-artifact-paths";
 import { daemonPaths } from "./daemon-paths";
 
-export type DaemonStartupExclusionOwner = "telegram" | "discord" | "slack";
+export type DaemonStartupExclusionOwner = "telegram" | "discord" | "slack" | "feishu-app";
 
 export interface DaemonStartupExclusionOptions {
 	/** Abort acquisition early; never releases a lease this call did not itself acquire. */

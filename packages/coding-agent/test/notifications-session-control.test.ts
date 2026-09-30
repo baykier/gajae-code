@@ -25,6 +25,18 @@ const BASE_CONFIG: NotificationConfig = {
 		channelId: undefined,
 		authorizedUserId: undefined,
 	},
+	feishu: {
+		enabled: undefined,
+		webhookUrl: undefined,
+		secret: undefined,
+	},
+	"feishu-app": {
+		enabled: undefined,
+		appId: undefined,
+		appSecret: undefined,
+		chatId: undefined,
+		authorizedOpenIds: undefined,
+	},
 	redact: false,
 	verbosity: "lean",
 	sessionScope: "all",

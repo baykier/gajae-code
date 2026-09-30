@@ -55,6 +55,7 @@ export const parityPrefix: Record<Adapter, string> = {
 	telegram: "T",
 	discord: "D",
 	slack: "S",
+	"feishu-app": "F",
 	mcp: "M",
 	acp: "A",
 	daemonCli: "L",

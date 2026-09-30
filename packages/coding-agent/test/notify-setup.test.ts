@@ -12,6 +12,7 @@ import {
 	runNotifyCliCommand,
 	runNotifyCommand as runNotifyCommandImpl,
 } from "../src/cli/notify-cli";
+import { notifyCommandArgsFromInvocation } from "../src/commands/notify";
 import type { CasReceipt } from "../src/config/atomic-yaml-patch";
 import { Settings, type SettingsAtomicPatch } from "../src/config/settings";
 import { getNotificationConfig, maskToken, tokenFingerprint } from "../src/sdk/bus/config";
@@ -1510,6 +1511,187 @@ test("interactive Discord setup validates prompted required values before persis
 	}
 });
 
+test("feishu setup parses flags, saves config, and reports the masked webhook", async () => {
+	expect(parseNotifyArgs(["notify", "setup", "feishu", "--feishu-webhook-url", "--redact"])).toBeUndefined();
+	const cmd = parseNotifyArgs([
+		"notify",
+		"setup",
+		"feishu",
+		"--feishu-webhook-url",
+		"https://open.feishu.cn/open-apis/bot/v2/hook/hook-token",
+		"--feishu-secret",
+		"feishu-signing-secret",
+		"--redact",
+	]);
+	expect(cmd).toMatchObject({
+		action: "setup",
+		provider: "feishu",
+		feishuWebhookUrl: "https://open.feishu.cn/open-apis/bot/v2/hook/hook-token",
+		feishuSecret: "feishu-signing-secret",
+		redact: true,
+	});
+	const settings = setupSettings();
+	const { stdout } = await captureOutput(() => runNotifyCliCommand({ ...(cmd as NotifyCommandArgs) }, { settings }));
+	expect(getNotificationConfig(settings).feishu).toMatchObject({
+		enabled: true,
+		webhookUrl: "https://open.feishu.cn/open-apis/bot/v2/hook/hook-token",
+		secret: "feishu-signing-secret",
+	});
+	expect(settings.get("notifications.redact")).toBe(true);
+	expect(stdout).toContain("Feishu configuration saved");
+	expect(stdout).toContain("webhookUrl=http…(len 55)");
+	expect(stdout).toContain("secret=feis…(len 21)");
+});
+test("feishu setup without a secret leaves signing unset", async () => {
+	const settings = setupSettings();
+	const { stdout } = await captureOutput(() =>
+		runNotifyCliCommand(
+			{
+				action: "setup",
+				provider: "feishu",
+				rawArgs: [],
+				feishuWebhookUrl: "https://open.feishu.cn/open-apis/bot/v2/hook/hook-token",
+			},
+			{ settings },
+		),
+	);
+	expect(getNotificationConfig(settings).feishu?.secret).toBeUndefined();
+	expect(stdout).toContain("secret=(unset; unsigned requests)");
+});
+
+test("feishu-app setup parses flags, saves config, and activates the daemon", async () => {
+	const settings = setupSettings();
+	let ensured: string | undefined;
+	const { stdout } = await captureOutput(() =>
+		runNotifyCliCommand(
+			{
+				action: "setup",
+				provider: "feishu-app",
+				rawArgs: [],
+				feishuAppId: "cli_app_id",
+				feishuAppSecret: "feishu-app-secret",
+				feishuAppChatId: "oc_chat",
+				feishuAppAuthorizedOpenIds: "ou_alice,ou_bob",
+			},
+			{
+				settings,
+				ensureProviderDaemon: async provider => {
+					ensured = provider;
+					return "attached";
+				},
+			},
+		),
+	);
+	expect(ensured).toBe("feishu-app");
+	expect(getNotificationConfig(settings)["feishu-app"]).toMatchObject({
+		enabled: true,
+		appId: "cli_app_id",
+		appSecret: "feishu-app-secret",
+		chatId: "oc_chat",
+		authorizedOpenIds: "ou_alice,ou_bob",
+	});
+	expect(stdout).toContain("Feishu app configuration saved and activated.");
+	expect(stdout).toContain("appSecret=feis…(len 17)");
+	expect(stdout).toContain("daemon=attached");
+});
+test("feishu-app setup prompts missing values including the open_id allowlist", async () => {
+	const settings = setupSettings();
+	const prompts: Array<[string, boolean]> = [];
+	const values = ["cli_app_id", "feishu-app-secret", "oc_chat", "ou_alice, ou_bob"];
+	await runNotifyCommand(
+		{ action: "setup", provider: "feishu-app", rawArgs: [] },
+		{
+			settings,
+			setupInteractive: true,
+			valuePrompt: async (label, masked) => {
+				prompts.push([label, masked]);
+				return values.shift() ?? "";
+			},
+			ensureProviderDaemon: async () => "attached",
+		},
+	);
+	expect(prompts).toEqual([
+		["feishu-app-id: ", true],
+		["feishu-app-secret: ", true],
+		["feishu-app-chat-id: ", false],
+		["feishu-app-authorized-open-ids: ", false],
+	]);
+	expect(getNotificationConfig(settings)["feishu-app"]).toMatchObject({
+		enabled: true,
+		appId: "cli_app_id",
+		appSecret: "feishu-app-secret",
+		chatId: "oc_chat",
+		authorizedOpenIds: "ou_alice, ou_bob",
+	});
+});
+test("feishu-app setup with an empty allowlist saves config but reports activation failure", async () => {
+	const settings = setupSettings();
+	let exitCode: number | undefined;
+	const values = ["cli_app_id", "feishu-app-secret", "oc_chat", ""];
+	const { stdout, stderr } = await captureOutput(() =>
+		runNotifyCommand(
+			{ action: "setup", provider: "feishu-app", rawArgs: [] },
+			{
+				settings,
+				setupInteractive: true,
+				valuePrompt: async () => values.shift() ?? "",
+				ensureProviderDaemon: async () => {
+					throw new Error("authorized open_id allowlist is required");
+				},
+				setExitCode: code => {
+					exitCode = code;
+				},
+			},
+		),
+	);
+	expect(exitCode).toBe(1);
+	expect(getNotificationConfig(settings)["feishu-app"]).toMatchObject({
+		appId: "cli_app_id",
+		appSecret: "feishu-app-secret",
+		chatId: "oc_chat",
+	});
+	expect(getNotificationConfig(settings)["feishu-app"]?.authorizedOpenIds).toBeUndefined();
+	expect(stdout).not.toContain("Feishu app configuration saved and activated.");
+	expect(stderr).toContain(
+		"Feishu app configuration saved, but Feishu app daemon did not become ready: authorized open_id allowlist is required.",
+	);
+});
+test("notify command wrapper maps feishu and feishu-app providers and flags", () => {
+	for (const provider of ["telegram", "discord", "slack", "feishu", "feishu-app"] as const) {
+		const cmd = notifyCommandArgsFromInvocation({ action: "setup", flags: {}, extra: [provider] });
+		expect(cmd.provider).toBe(provider);
+	}
+	expect(() => notifyCommandArgsFromInvocation({ action: "setup", flags: {}, extra: ["bogus"] })).toThrow(
+		"Unknown notification provider: bogus",
+	);
+	const cmd = notifyCommandArgsFromInvocation({
+		action: "setup",
+		flags: {
+			"feishu-webhook-url": "https://open.feishu.cn/open-apis/bot/v2/hook/hook-token",
+			"feishu-secret": "feishu-signing-secret",
+			"feishu-app-id": "cli_app_id",
+			"feishu-app-secret": "feishu-app-secret",
+			"feishu-app-chat-id": "oc_chat",
+			"feishu-app-authorized-open-ids": "ou_alice,ou_bob",
+			redact: true,
+		},
+		extra: ["feishu-app"],
+	});
+	expect(cmd.provider).toBe("feishu-app");
+	expect(cmd.feishuWebhookUrl).toBe("https://open.feishu.cn/open-apis/bot/v2/hook/hook-token");
+	expect(cmd.feishuSecret).toBe("feishu-signing-secret");
+	expect(cmd.feishuAppId).toBe("cli_app_id");
+	expect(cmd.feishuAppSecret).toBe("feishu-app-secret");
+	expect(cmd.feishuAppChatId).toBe("oc_chat");
+	expect(cmd.feishuAppAuthorizedOpenIds).toBe("ou_alice,ou_bob");
+	expect(cmd.redact).toBe(true);
+	expect(() => notifyCommandArgsFromInvocation({ action: "status", flags: {}, extra: ["feishu-app"] })).toThrow(
+		"Unexpected notify arguments: feishu-app",
+	);
+	expect(() =>
+		notifyCommandArgsFromInvocation({ action: "setup", flags: { provider: "feishu-app" }, extra: [] }),
+	).toThrow("--provider is valid only for notify health and notify test.");
+});
 test("notify parser rejects flag values that look like flags and unknown subcommands", () => {
 	expect(parseNotifyArgs(["notify", "setup", "discord", "--discord-bot-token", "--redact"])).toBeUndefined();
 	expect(parseNotifyArgs(["notify", "bogus"])).toBeUndefined();

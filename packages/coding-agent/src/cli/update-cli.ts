@@ -17,6 +17,7 @@ import chalk from "chalk";
 import { acquireFileLock } from "../config/file-lock";
 import { Settings } from "../config/settings";
 import { isUpdateChannel, UPDATE_CHANNELS, type UpdateChannel } from "../config/update-channel";
+import type { DaemonKind } from "../daemon/control-types";
 import { installDefaultGjcDefinitions } from "../defaults/gjc-defaults";
 import { theme } from "../modes/theme/theme";
 import { getNotificationConfig, type NotificationProvider, resolveNotificationProvider } from "../sdk/bus/config";
@@ -1347,7 +1348,7 @@ export function hasManagedNotifySetup(settings: Settings): boolean {
 	return managedNotifyDaemonKinds(settings).length > 0;
 }
 
-function managedNotifyDaemonKinds(settings: Settings): NotificationProvider[] {
+function managedNotifyDaemonKinds(settings: Settings): DaemonKind[] {
 	const config = getNotificationConfig(settings);
 	return (["telegram", "discord", "slack"] as const).filter(provider => {
 		const resolution = resolveNotificationProvider(config, provider);

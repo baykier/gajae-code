@@ -9,6 +9,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -27,6 +28,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -45,6 +47,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -63,6 +66,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -81,6 +85,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -99,6 +104,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -117,6 +123,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -135,6 +142,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -153,6 +161,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -171,6 +180,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -189,6 +199,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -207,6 +218,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -225,6 +237,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -243,6 +256,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -261,6 +275,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -279,6 +294,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -297,6 +313,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -315,6 +332,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -333,6 +351,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -351,6 +370,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -369,6 +389,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -387,6 +408,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -405,6 +427,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -423,6 +446,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -441,6 +465,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -459,6 +484,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -477,6 +503,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -495,6 +522,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -513,6 +541,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -531,6 +560,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -549,6 +579,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -567,6 +598,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -585,6 +617,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -603,6 +636,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -621,6 +655,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -639,6 +674,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -657,6 +693,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -675,6 +712,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "machine_only"
@@ -693,6 +731,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "prohibited"
@@ -711,6 +750,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "prohibited"
@@ -729,6 +769,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -747,6 +788,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -765,6 +807,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -783,6 +826,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -801,6 +845,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -819,6 +864,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -837,6 +883,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -855,6 +902,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -873,6 +921,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -891,6 +940,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -909,6 +959,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -927,6 +978,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -945,6 +997,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -963,6 +1016,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -981,6 +1035,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "machine_only",
 			"daemonCli": "machine_only"
@@ -999,6 +1054,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1017,6 +1073,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1035,6 +1092,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1053,6 +1111,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1071,6 +1130,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1089,6 +1149,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1107,6 +1168,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -1125,6 +1187,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "generic_safe"
@@ -1143,6 +1206,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1161,6 +1225,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1179,6 +1244,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1197,6 +1263,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1215,6 +1282,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1233,6 +1301,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1251,6 +1320,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1269,6 +1339,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1287,6 +1358,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1305,6 +1377,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1323,6 +1396,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1341,6 +1415,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1359,6 +1434,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1377,6 +1453,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1395,6 +1472,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1413,6 +1491,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1431,6 +1510,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1449,6 +1529,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1467,6 +1548,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1485,6 +1567,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1503,6 +1586,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1521,6 +1605,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1539,6 +1624,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1557,6 +1643,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1575,6 +1662,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1593,6 +1681,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1611,6 +1700,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1629,6 +1719,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1647,6 +1738,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1665,6 +1757,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1683,6 +1776,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "machine_only"
@@ -1701,6 +1795,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "machine_only"
@@ -1719,6 +1814,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "machine_only"
@@ -1737,6 +1833,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "machine_only"
@@ -1755,6 +1852,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "machine_only"
@@ -1773,6 +1871,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "machine_only"
@@ -1868,6 +1967,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1886,6 +1986,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1904,6 +2005,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1922,6 +2024,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1951,6 +2054,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1980,6 +2084,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -1998,6 +2103,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2016,6 +2122,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2045,6 +2152,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2063,6 +2171,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2136,6 +2245,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2209,6 +2319,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -2238,6 +2349,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "provider_only",
 			"daemonCli": "machine_only"
@@ -2278,6 +2390,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2296,6 +2409,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -2325,6 +2439,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2343,6 +2458,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -2394,6 +2510,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -2434,6 +2551,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2452,6 +2570,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2492,6 +2611,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2510,6 +2630,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -2836,6 +2957,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3096,6 +3218,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3114,6 +3237,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3187,6 +3311,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3238,6 +3363,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3256,6 +3382,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3318,6 +3445,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3380,6 +3508,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3541,6 +3670,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3570,6 +3700,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3588,6 +3719,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3606,6 +3738,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3624,6 +3757,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3642,6 +3776,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3836,6 +3971,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3865,6 +4001,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3883,6 +4020,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -3967,6 +4105,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4007,6 +4146,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4025,6 +4165,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4043,6 +4184,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4061,6 +4203,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4123,6 +4266,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4141,6 +4285,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4214,6 +4359,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4320,6 +4466,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -4338,6 +4485,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4356,6 +4504,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4374,6 +4523,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -4392,6 +4542,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4476,6 +4627,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4714,6 +4866,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4732,6 +4885,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4772,6 +4926,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4790,6 +4945,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4863,6 +5019,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4925,6 +5082,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4943,6 +5101,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4961,6 +5120,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -4990,6 +5150,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5008,6 +5169,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5026,6 +5188,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5044,6 +5207,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5106,6 +5270,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -5157,6 +5322,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5175,6 +5341,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5193,6 +5360,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5211,6 +5379,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5229,6 +5398,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5247,6 +5417,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -5276,6 +5447,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -5415,6 +5587,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5433,6 +5606,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -5451,6 +5625,7 @@
 			"telegram": "prohibited",
 			"discord": "prohibited",
 			"slack": "prohibited",
+			"feishu-app": "prohibited",
 			"mcp": "prohibited",
 			"acp": "prohibited",
 			"daemonCli": "prohibited"
@@ -5480,6 +5655,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5498,6 +5674,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5527,6 +5704,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5556,6 +5734,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5585,6 +5764,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5603,6 +5783,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5643,6 +5824,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"
@@ -5661,6 +5843,7 @@
 			"telegram": "generic_safe",
 			"discord": "generic_safe",
 			"slack": "generic_safe",
+			"feishu-app": "generic_safe",
 			"mcp": "generic_safe",
 			"acp": "generic_safe",
 			"daemonCli": "generic_safe"

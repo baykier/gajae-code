@@ -36,6 +36,8 @@ import {
 	hasAnyCompleteProvider,
 	hasAnyEffectivelyEnabledProvider,
 	isDiscordComplete,
+	isFeishuAppComplete,
+	isFeishuComplete,
 	isProviderEffectivelyEnabled,
 	isSlackComplete,
 	isTelegramComplete,
@@ -50,6 +52,8 @@ import {
 import { type DaemonPaths, daemonPaths, HEARTBEAT_TTL_MS } from "./daemon-paths";
 import { DiscordLiveProvider } from "./discord-live-provider";
 import type { DiscordDiagnosticProvider } from "./discord-provider";
+import { type FeishuAppDiagnosticProvider, FeishuAppLiveProvider } from "./feishu-app-provider";
+import { sendFeishuWebhookText } from "./feishu-webhook";
 import { SlackLiveProvider } from "./slack-live-provider";
 import type { SlackDiagnosticProvider } from "./slack-provider";
 import {
@@ -131,7 +135,11 @@ function sanitizeProviderDiagnostic(text: string, cfg: NotificationConfig, provi
 			? [cfg.botToken]
 			: provider === "discord"
 				? [cfg.discord.botToken]
-				: [cfg.slack.botToken, cfg.slack.appToken];
+				: provider === "feishu"
+					? [cfg.feishu.webhookUrl, cfg.feishu.secret]
+					: provider === "feishu-app"
+						? [cfg["feishu-app"].appSecret, cfg["feishu-app"].appId]
+						: [cfg.slack.botToken, cfg.slack.appToken];
 	let detail = text;
 	for (const secret of secrets) detail = sanitizeDiagnostic(detail, secret);
 	return detail;
@@ -299,6 +307,11 @@ export interface NotificationServiceDeps {
 	apiBase?: string;
 	createDiscordDiagnostic?: (config: { applicationId: string; botToken: string }) => DiscordDiagnosticProvider;
 	createSlackDiagnostic?: (config: { appToken: string; botToken: string }) => SlackDiagnosticProvider;
+	createFeishuAppDiagnostic?: (config: {
+		appId: string;
+		appSecret: string;
+		chatId: string;
+	}) => FeishuAppDiagnosticProvider;
 	providerRuntimeStatus?: (provider: NotificationProvider) => Promise<NotificationRuntime> | NotificationRuntime;
 }
 
@@ -344,6 +357,8 @@ export interface NotificationStatusReport {
 	telegram: AdapterConfigView & { tokenFingerprint: string | undefined };
 	discord: AdapterConfigView;
 	slack: AdapterConfigView;
+	feishu: AdapterConfigView;
+	"feishu-app": AdapterConfigView;
 }
 
 function adapterView(
@@ -381,18 +396,22 @@ export function buildNotificationStatusReport(settings: Settings): NotificationS
 		},
 		discord: adapterView(cfg, "discord", cfg.discord.botToken, cfg.discord.parentChannelId),
 		slack: adapterView(cfg, "slack", cfg.slack.botToken, cfg.slack.channelId),
+		feishu: adapterView(cfg, "feishu", cfg.feishu.webhookUrl, cfg.feishu.webhookUrl ? "group webhook" : undefined),
+		"feishu-app": adapterView(cfg, "feishu-app", cfg["feishu-app"].appSecret, cfg["feishu-app"].chatId),
 	};
 }
 
 /** Render a status report as human-readable lines (no secrets). */
 export function formatNotificationStatusReport(report: NotificationStatusReport): string {
 	const yesNo = (value: boolean): string => (value ? "yes" : "no");
+	const credentialLabel = (name: NotificationProvider): string =>
+		name === "feishu" ? "webhookUrl" : name === "feishu-app" ? "appSecret" : "botToken";
 	const provider = (name: NotificationProvider, view: AdapterConfigView): string[] => [
 		`  ${name}.configured: ${yesNo(view.configured)}`,
 		`  ${name}.needsRepair: ${yesNo(view.quarantined)}`,
 		`  ${name}.desired: ${view.desiredEnabled ? "on" : "off"} (${view.desiredSource})`,
 		`  ${name}.effective: ${yesNo(view.effectiveEnabled)}`,
-		`  ${name}.botToken: ${view.botTokenMasked}`,
+		`  ${name}.${credentialLabel(name)}: ${view.botTokenMasked}`,
 		`  ${name}.destination: ${view.channel ?? "(unset)"}`,
 	];
 	return [
@@ -406,6 +425,8 @@ export function formatNotificationStatusReport(report: NotificationStatusReport)
 		`  telegram.fingerprint: ${report.telegram.tokenFingerprint ?? "(unset)"}`,
 		...provider("discord", report.discord),
 		...provider("slack", report.slack),
+		...provider("feishu", report.feishu),
+		...provider("feishu-app", report["feishu-app"]),
 	].join("\n");
 }
 
@@ -774,8 +795,71 @@ async function probeTelegramReachability(
 	}
 }
 
+const FEISHU_OPEN_BASE = "https://open.feishu.cn";
+
+/**
+ * REST-only Feishu app diagnostic: exchange credentials for a tenant token,
+ * then confirm the bot can see the bound chat. Read-only — it never posts into
+ * the group, so `--probe` stays side-effect free for the app bot.
+ */
+async function probeFeishuAppReachability(
+	cfg: NotificationConfig & { "feishu-app": { appId: string; appSecret: string; chatId: string } },
+	deps: NotificationServiceDeps,
+	signal?: AbortSignal,
+): Promise<{ ok: boolean; detail: string }> {
+	if (signal?.aborted) return { ok: false, detail: "Feishu app probe cancelled." };
+	const { appId, appSecret, chatId } = cfg["feishu-app"];
+	const fetchImpl = deps.fetchImpl ?? globalThis.fetch;
+	try {
+		const authResponse = await fetchImpl(`${FEISHU_OPEN_BASE}/open-apis/auth/v3/tenant_access_token/internal`, {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({ app_id: appId, app_secret: appSecret }),
+			signal,
+		});
+		const auth = (await authResponse.json().catch(() => undefined)) as
+			| { code?: number; msg?: string; tenant_access_token?: string }
+			| undefined;
+		if (!authResponse.ok || !auth || typeof auth.code !== "number" || auth.code !== 0 || !auth.tenant_access_token) {
+			return {
+				ok: false,
+				detail: sanitizeDiagnostic(
+					auth?.msg
+						? `Feishu rejected the app credentials: ${auth.msg} (code ${auth.code}).`
+						: `Feishu credential exchange failed (HTTP ${authResponse.status}).`,
+					appSecret,
+				),
+			};
+		}
+		const chatResponse = await fetchImpl(`${FEISHU_OPEN_BASE}/open-apis/im/v1/chats/${encodeURIComponent(chatId)}`, {
+			headers: { authorization: `Bearer ${auth.tenant_access_token}` },
+			signal,
+		});
+		const chat = (await chatResponse.json().catch(() => undefined)) as { code?: number; msg?: string } | undefined;
+		if (chatResponse.ok && chat?.code === 0)
+			return { ok: true, detail: "credentials accepted and the bot can access the bound chat" };
+		return {
+			ok: false,
+			detail: sanitizeDiagnostic(
+				chat?.msg
+					? `the bot cannot access the bound chat: ${chat.msg} (code ${chat.code})`
+					: `chat visibility check failed (HTTP ${chatResponse.status})`,
+				auth.tenant_access_token,
+			),
+		};
+	} catch (error) {
+		if (signal?.aborted) return { ok: false, detail: "Feishu app probe cancelled." };
+		return {
+			ok: false,
+			detail: sanitizeDiagnostic(error instanceof Error ? error.message : "network error", appSecret),
+		};
+	}
+}
+
 function effectiveProviders(cfg: NotificationConfig): NotificationProvider[] {
-	return (["telegram", "discord", "slack"] as const).filter(provider => isProviderEffectivelyEnabled(cfg, provider));
+	return (["telegram", "discord", "slack", "feishu", "feishu-app"] as const).filter(provider =>
+		isProviderEffectivelyEnabled(cfg, provider),
+	);
 }
 
 function selectNotificationProvider(
@@ -827,6 +911,16 @@ async function probeSelectedProvider(
 				probe.ok && (!probe.teamId || probe.teamId !== cfg.slack.workspaceId)
 					? { ok: false, detail: "Slack workspace identity does not match the configured workspace ID." }
 					: probe;
+		} else if (provider === "feishu" && isFeishuComplete(cfg)) {
+			const probe = await sendFeishuWebhookText(
+				{ webhookUrl: cfg.feishu.webhookUrl, secret: cfg.feishu.secret, text: "GJC notifications health probe." },
+				{ fetchImpl: deps.fetchImpl },
+			);
+			result = probe.ok
+				? { ok: true, detail: `delivered to the Feishu group webhook (${probe.chunks} message(s))` }
+				: { ok: false, detail: probe.detail };
+		} else if (provider === "feishu-app" && isFeishuAppComplete(cfg)) {
+			result = await probeFeishuAppReachability(cfg, deps, signal);
 		} else {
 			result = { ok: false, detail: `${provider} configuration is unavailable.` };
 		}
@@ -1182,20 +1276,23 @@ export async function sendNotificationTest(opts: TestOptions): Promise<Notificat
 				: `${provider} is unavailable because configuration, desired intent, or the global master is off.`,
 		};
 	}
-	try {
-		if (!(await selectedProviderRuntimeReady(provider, deps))) {
-			return { ok: false, adapter: provider, detail: `${provider} runtime is not ready or attached.` };
+	// Feishu webhook delivery is stateless: there is no daemon runtime to probe.
+	if (provider !== "feishu") {
+		try {
+			if (!(await selectedProviderRuntimeReady(provider, deps))) {
+				return { ok: false, adapter: provider, detail: `${provider} runtime is not ready or attached.` };
+			}
+		} catch (error) {
+			return {
+				ok: false,
+				adapter: provider,
+				detail: sanitizeProviderDiagnostic(
+					error instanceof Error ? error.message : `${provider} runtime readiness check failed.`,
+					cfg,
+					provider,
+				),
+			};
 		}
-	} catch (error) {
-		return {
-			ok: false,
-			adapter: provider,
-			detail: sanitizeProviderDiagnostic(
-				error instanceof Error ? error.message : `${provider} runtime readiness check failed.`,
-				cfg,
-				provider,
-			),
-		};
 	}
 	if (opts.signal?.aborted)
 		return { ok: false, adapter: provider, detail: `${provider} notification test cancelled.` };
@@ -1317,6 +1414,72 @@ export async function sendNotificationTest(opts: TestOptions): Promise<Notificat
 					error instanceof Error ? error.message : "Slack notification delivery failed.",
 					cfg,
 					"slack",
+				),
+			};
+		}
+	}
+	if (provider === "feishu" && isFeishuComplete(cfg)) {
+		try {
+			const result = await sendFeishuWebhookText(
+				{ webhookUrl: cfg.feishu.webhookUrl, secret: cfg.feishu.secret, text, signal: opts.signal },
+				{ fetchImpl: deps.fetchImpl },
+			);
+			return {
+				ok: result.ok,
+				adapter: "feishu",
+				destination: "group webhook",
+				...(result.ok ? {} : { uncertain: result.uncertain }),
+				detail: result.ok
+					? `delivered to the Feishu group webhook (${result.chunks} message${result.chunks === 1 ? "" : "s"})`
+					: sanitizeProviderDiagnostic(result.detail, cfg, "feishu"),
+			};
+		} catch (error) {
+			return {
+				ok: false,
+				adapter: "feishu",
+				destination: "group webhook",
+				uncertain: true,
+				detail: sanitizeProviderDiagnostic(
+					error instanceof Error ? error.message : "Feishu notification delivery failed.",
+					cfg,
+					"feishu",
+				),
+			};
+		}
+	}
+	if (provider === "feishu-app" && isFeishuAppComplete(cfg)) {
+		try {
+			const adapter =
+				deps.createFeishuAppDiagnostic?.({
+					appId: cfg["feishu-app"].appId,
+					appSecret: cfg["feishu-app"].appSecret,
+					chatId: cfg["feishu-app"].chatId,
+				}) ??
+				new FeishuAppLiveProvider({
+					appId: cfg["feishu-app"].appId,
+					appSecret: cfg["feishu-app"].appSecret,
+					chatId: cfg["feishu-app"].chatId,
+				});
+			const result = await adapter.sendText(text);
+			return {
+				ok: result.ok,
+				adapter: "feishu-app",
+				destination: cfg["feishu-app"].chatId,
+				...(result.ok ? {} : { uncertain: result.uncertain }),
+				detail: result.ok
+					? `delivered to the bound Feishu chat ${cfg["feishu-app"].chatId}`
+					: sanitizeProviderDiagnostic(result.detail, cfg, "feishu-app"),
+			};
+		} catch (error) {
+			return {
+				ok: false,
+				adapter: "feishu-app",
+				destination: cfg["feishu-app"].chatId,
+				uncertain: true,
+				detail: sanitizeProviderDiagnostic(
+					error instanceof Error ? error.message : "Feishu app notification delivery failed.",
+					cfg,
+					"feishu-app",
 				),
 			};
 		}
