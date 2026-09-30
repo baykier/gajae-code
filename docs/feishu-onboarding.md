@@ -149,6 +149,15 @@ Runtime behavior:
   Failures post a rejection reason instead of staying silent. Without an
   active bound session free-form text stays silent — send `/sdk` to see the
   no-session hint.
+- Live status cards: while a turn runs, the bot keeps one ephemeral card in the
+  chat that mirrors the active tool (with ✓/✗ outcome and elapsed duration),
+  the latest streamed text (truncated preview), and model/token context,
+  redrawn at most once every 3 seconds. The card is deleted when the final
+  answer arrives or the session closes; if deletion fails it turns grey with a
+  「已完成 · 耗时 …」 summary. Controlled by
+  `notifications.feishu-app.streaming.enabled` (default on). While the lane is
+  active, the mirrored live frames (tool activity, reasoning summaries, context
+  updates) are not also posted as plain text — finalized answers are unaffected.
 - Feishu API rejections (non-zero result code) are definitive failures;
   transport failures are reported as uncertain. Failures are logged through
   `gjc notify status` and delivery logs. Like the webhook transport there is
