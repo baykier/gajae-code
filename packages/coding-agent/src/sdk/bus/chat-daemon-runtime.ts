@@ -1017,10 +1017,11 @@ export class ChatDaemonRuntime {
 			return false;
 		}
 		const result = response.result;
-		// Steer reconciliation resolves with a top-level accepted flag, unlike
-		// turn.prompt's nested receipt.
+		// The steer verdict on the wire is the durable ledger projection's
+		// `status` field ("accepted" | "rejected" | …); the host never emits a
+		// separate boolean, so read the status instead of a phantom flag.
 		const accepted =
-			typeof result === "object" && result !== null && (result as { accepted?: unknown }).accepted === true;
+			typeof result === "object" && result !== null && (result as { status?: unknown }).status === "accepted";
 		logger.info(`chat free-form turn.steer accepted=${accepted}`);
 		return accepted;
 	}
