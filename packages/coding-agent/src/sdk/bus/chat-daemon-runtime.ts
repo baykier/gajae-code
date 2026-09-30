@@ -985,16 +985,19 @@ export class ChatDaemonRuntime {
 		idempotencyKey: string,
 	): Promise<boolean> {
 		if (!expectedAttachment.isCurrent()) throw new ChatDeliveryError("pre_send");
-		// turn.prompt is durable and explicitly acknowledged, unlike the raw
-		// user_message WS injection whose token-authorized frame can vanish
-		// inside hosts whose notification runtime is not wired to this
-		// endpoint. A prompt submitted mid-run queues for the next idle
-		// boundary; the daemon surfaces the acceptance receipt to the chat.
+		// turn.steer is the instant-reply lane: mid-run the host admits the
+		// text into the live loop immediately, and when idle it routes the
+		// message as a follow-up owned by the next turn — never parked in a
+		// queue nobody owns. A durable clientRef keeps redelivery idempotent
+		// via steer reconciliation, and the explicit control request (unlike
+		// the raw user_message WS injection, whose token-authorized frame can
+		// vanish inside hosts whose notification runtime is not wired to this
+		// endpoint) yields an acceptance verdict the daemon surfaces to the chat.
 		const response = await this.#router.request(
 			sessionId,
 			{
 				type: "control_request",
-				operation: "turn.prompt",
+				operation: "turn.steer",
 				input: { text: content, clientRef: idempotencyKey },
 				confirm: true,
 				idempotencyKey,
@@ -1009,16 +1012,16 @@ export class ChatDaemonRuntime {
 				failure !== null &&
 				typeof (failure as { message?: unknown }).message === "string"
 					? (failure as { message: string }).message
-					: "turn.prompt rejected";
-			logger.warn(`chat free-form turn.prompt rejected: ${message}`);
+					: "turn.steer rejected";
+			logger.warn(`chat free-form turn.steer rejected: ${message}`);
 			return false;
 		}
 		const result = response.result;
-		const receipt =
-			typeof result === "object" && result !== null ? (result as { receipt?: unknown }).receipt : undefined;
+		// Steer reconciliation resolves with a top-level accepted flag, unlike
+		// turn.prompt's nested receipt.
 		const accepted =
-			typeof receipt === "object" && receipt !== null && (receipt as { accepted?: unknown }).accepted === true;
-		logger.info(`chat free-form turn.prompt accepted=${accepted}`);
+			typeof result === "object" && result !== null && (result as { accepted?: unknown }).accepted === true;
+		logger.info(`chat free-form turn.steer accepted=${accepted}`);
 		return accepted;
 	}
 

@@ -513,16 +513,16 @@ export class FeishuAppNotificationDaemon {
 			await this.#dispatchCommand(text);
 			return;
 		}
-		// Free-form chat is a conversational surface like Telegram/Slack: route
-		// the stripped text into the bound session as a durable turn.prompt.
-		// The raw WS user_message injection is silently dropped by hosts whose
-		// notification runtime is not wired to this endpoint (observed live:
-		// frames accepted at TCP level, agent never sees them), while
-		// turn.prompt is a control request with an explicit acceptance
-		// receipt. A prompt submitted mid-run queues for the next idle
-		// boundary instead of steering the live run. Without a bound session
-		// nothing can receive it, so stay quiet — the /sdk no-session hint
-		// already covers that state.
+		// Free-form chat is the instant-reply lane: route the stripped text
+		// into the bound session as turn.steer. The raw WS user_message
+		// injection is silently dropped by hosts whose notification runtime is
+		// not wired to this endpoint (observed live: frames accepted at TCP
+		// level, agent never sees them), while turn.steer is a control request
+		// with an explicit acceptance verdict. Mid-run the host admits the
+		// text into the live loop immediately; idle it becomes a follow-up
+		// owned by the next turn. Without a bound session nothing can receive
+		// it, so stay quiet — the /sdk no-session hint already covers that
+		// state.
 		const boundSessionId = this.#lastSessionId;
 		if (!boundSessionId) {
 			logger.info("Feishu app bot ignored a free-form message; no active session is bound to receive it.");

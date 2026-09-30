@@ -55,6 +55,7 @@ class FakeFeishuAppProvider implements FeishuAppProviderClient {
 function fakeRouterClient(
 	frames: Record<string, unknown>[] = [],
 	deliver?: (emit: (correlated: Record<string, unknown>) => void) => void,
+	steerAccepted = true,
 ): SessionRouterClient {
 	return {
 		onFrame: handler => {
@@ -66,17 +67,18 @@ function fakeRouterClient(
 			frames.push(frame as Record<string, unknown>);
 			if (
 				(frame as { type?: string }).type === "control_request" &&
-				(frame as { operation?: string }).operation === "turn.prompt"
+				(frame as { operation?: string }).operation === "turn.steer"
 			) {
-				// Mirrors the real host control envelope: the acceptance receipt is
-				// nested under `result`, not at the top level.
+				// Mirrors the real host steer envelope: durable steer
+				// reconciliation resolves with a top-level accepted flag.
 				return {
 					ok: true,
 					result: {
-						version: 2,
-						operationRef: "turn.prompt",
-						status: "accepted",
-						receipt: { accepted: true, clientRef: (frame as { idempotencyKey?: string }).idempotencyKey },
+						accepted: steerAccepted,
+						commandId: "cmd_steer_1",
+						turnId: "turn_steer_1",
+						clientRef: (frame as { idempotencyKey?: string }).idempotencyKey,
+						status: steerAccepted ? "accepted" : "rejected",
 					},
 				};
 			}
@@ -105,7 +107,7 @@ async function withStartedRuntime(
 		emitFrame: (correlated: Record<string, unknown>) => void;
 	}) => Promise<void>,
 	providerOverrides: Partial<FakeFeishuAppProvider> = {},
-	configOverrides: { streamingEnabled?: boolean; verbosity?: "lean" | "verbose" } = {},
+	configOverrides: { streamingEnabled?: boolean; verbosity?: "lean" | "verbose"; steerAccepted?: boolean } = {},
 ): Promise<void> {
 	const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "gjc-feishu-runtime-"));
 	let runtime: ChatDaemonRuntime | undefined;
@@ -117,6 +119,7 @@ async function withStartedRuntime(
 		queued(correlated);
 	};
 	const streamingEnabled = configOverrides.streamingEnabled ?? true;
+	const steerAccepted = configOverrides.steerAccepted ?? true;
 	const verbosity = configOverrides.verbosity ?? "lean";
 	try {
 		const stateRoot = path.join(agentDir, ".gjc", "state");
@@ -179,7 +182,7 @@ async function withStartedRuntime(
 				},
 				routerDeps: {
 					createIndex: () => index,
-					createClient: async () => fakeRouterClient(frames, emit => emitFrameQueue.push(emit)),
+					createClient: async () => fakeRouterClient(frames, emit => emitFrameQueue.push(emit), steerAccepted),
 					setInterval: (() => 0) as unknown as typeof setInterval,
 					clearInterval: (() => undefined) as unknown as typeof clearInterval,
 				},
@@ -243,7 +246,7 @@ describe("chat daemon runtime feishu-app branch", () => {
 			},
 		);
 	});
-	test("free-form messages dispatch a durable turn.prompt and answer with an acceptance ack", async () => {
+	test("free-form messages dispatch turn.steer and answer with an acceptance ack", async () => {
 		const texts: string[] = [];
 		await withStartedRuntime(
 			async ({ provider, runtime, frames }) => {
@@ -259,12 +262,12 @@ describe("chat daemon runtime feishu-app branch", () => {
 				});
 				for (let attempt = 0; attempt < 2_000 && texts.length <= bound; attempt++) await Bun.sleep(1);
 				expect(texts[texts.length - 1]).toBe("已提交到会话。");
-				const prompt = frames.find(
-					frame => frame.type === "control_request" && frame.operation === "turn.prompt",
-				) as { input?: { text?: string; clientRef?: string }; idempotencyKey?: string } | undefined;
-				expect(prompt).toBeDefined();
-				expect(prompt?.input?.text).toBe("检查一下构建状态");
-				expect(prompt?.input?.clientRef).toBe(prompt?.idempotencyKey);
+				const steer = frames.find(frame => frame.type === "control_request" && frame.operation === "turn.steer") as
+					| { input?: { text?: string; clientRef?: string }; idempotencyKey?: string }
+					| undefined;
+				expect(steer).toBeDefined();
+				expect(steer?.input?.text).toBe("检查一下构建状态");
+				expect(steer?.input?.clientRef).toBe(steer?.idempotencyKey);
 				expect(frames.some(frame => (frame as { type?: string }).type === "user_message")).toBe(false);
 			},
 			{
@@ -273,6 +276,32 @@ describe("chat daemon runtime feishu-app branch", () => {
 					return Promise.resolve({ ok: true as const, messageId: undefined });
 				},
 			},
+		);
+	});
+	test("free-form chat surfaces a steer rejection through the rejected hint", async () => {
+		const texts: string[] = [];
+		await withStartedRuntime(
+			async ({ provider, runtime }) => {
+				await runtime.reconcile({ waitForReplay: true });
+				for (let attempt = 0; attempt < 2_000 && texts.length === 0; attempt++) await Bun.sleep(1);
+				const bound = texts.length;
+				await provider.handler?.({
+					kind: "message",
+					senderOpenId: "ou_alice",
+					text: "换个思路重试",
+					value: undefined,
+					messageId: "om_4",
+				});
+				for (let attempt = 0; attempt < 2_000 && texts.length <= bound; attempt++) await Bun.sleep(1);
+				expect(texts[texts.length - 1]).toBe("会话未接受该消息（队列可能已满），请稍后重试。");
+			},
+			{
+				sendText: (content?: string) => {
+					texts.push(content ?? "");
+					return Promise.resolve({ ok: true as const, messageId: undefined });
+				},
+			},
+			{ steerAccepted: false },
 		);
 	});
 

@@ -551,7 +551,7 @@ describe("feishu app daemon mention handling", () => {
 		expect(onCommandCalls[0]).toMatchObject({ content: "/sdk help", sessionId: "s1" });
 		await daemon.stop();
 	});
-	test("free-form chat dispatches a durable turn.prompt through onFreeForm and acks acceptance", async () => {
+	test("free-form chat routes through onFreeForm and acks acceptance", async () => {
 		const provider = new FakeFeishuAppProvider();
 		const attachment = {
 			isCurrent(): boolean {
