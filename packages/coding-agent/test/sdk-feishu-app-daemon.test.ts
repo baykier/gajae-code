@@ -192,6 +192,15 @@ class FakeFeishuAppProvider implements FeishuAppProviderClient {
 		return { ok: true, messageId: undefined };
 	}
 
+	deletions: string[] = [];
+	deleteFailure: FeishuAppDeliveryResult | undefined;
+
+	async deleteMessage(messageId: string): Promise<FeishuAppDeliveryResult> {
+		if (this.deleteFailure) return this.deleteFailure;
+		this.deletions.push(messageId);
+		return { ok: true, messageId: undefined };
+	}
+
 	emit(envelope: FeishuAppInboundEnvelope): Promise<void> {
 		return this.handler?.(envelope) ?? Promise.resolve();
 	}

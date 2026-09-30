@@ -17,6 +17,9 @@ class FakeFeishuAppProvider implements FeishuAppProviderClient {
 	stops = 0;
 	transportHealthy: boolean | undefined = true;
 	startError: Error | undefined;
+	cards: Record<string, unknown>[] = [];
+	updates: Array<{ card: Record<string, unknown>; messageId: string }> = [];
+	deletions: string[] = [];
 
 	async start(onEnvelope: (envelope: FeishuAppInboundEnvelope) => void | Promise<void>): Promise<void> {
 		if (this.startError) throw this.startError;
@@ -33,18 +36,29 @@ class FakeFeishuAppProvider implements FeishuAppProviderClient {
 		return { ok: true, messageId: undefined };
 	}
 
-	async sendCard(): Promise<{ ok: true; messageId: undefined }> {
+	async sendCard(card: Record<string, unknown>): Promise<{ ok: true; messageId: string }> {
+		this.cards.push(card);
+		return { ok: true, messageId: `om_status_${this.cards.length}` };
+	}
+
+	async updateCard(messageId: string, card: Record<string, unknown>): Promise<{ ok: true; messageId: undefined }> {
+		this.updates.push({ card, messageId });
 		return { ok: true, messageId: undefined };
 	}
 
-	async updateCard(): Promise<{ ok: true; messageId: undefined }> {
+	async deleteMessage(messageId: string): Promise<{ ok: true; messageId: undefined }> {
+		this.deletions.push(messageId);
 		return { ok: true, messageId: undefined };
 	}
 }
 
-function fakeRouterClient(frames: Record<string, unknown>[] = []): SessionRouterClient {
+function fakeRouterClient(
+	frames: Record<string, unknown>[] = [],
+	deliver?: (emit: (correlated: Record<string, unknown>) => void) => void,
+): SessionRouterClient {
 	return {
 		onFrame: handler => {
+			deliver?.(correlated => void handler(correlated as never));
 			void handler;
 			return () => undefined;
 		},
@@ -88,12 +102,22 @@ async function withStartedRuntime(
 		provider: FakeFeishuAppProvider;
 		runtime: ChatDaemonRuntime;
 		frames: Record<string, unknown>[];
+		emitFrame: (correlated: Record<string, unknown>) => void;
 	}) => Promise<void>,
 	providerOverrides: Partial<FakeFeishuAppProvider> = {},
+	configOverrides: { streamingEnabled?: boolean; verbosity?: "lean" | "verbose" } = {},
 ): Promise<void> {
 	const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "gjc-feishu-runtime-"));
 	let runtime: ChatDaemonRuntime | undefined;
 	const frames: Record<string, unknown>[] = [];
+	const emitFrameQueue: Array<(correlated: Record<string, unknown>) => void> = [];
+	const emitFrame: (correlated: Record<string, unknown>) => void = correlated => {
+		const queued = emitFrameQueue[0];
+		if (!queued) throw new Error("router client is not connected yet");
+		queued(correlated);
+	};
+	const streamingEnabled = configOverrides.streamingEnabled ?? true;
+	const verbosity = configOverrides.verbosity ?? "lean";
 	try {
 		const stateRoot = path.join(agentDir, ".gjc", "state");
 		const endpointFile = path.join(stateRoot, "sdk", `${SESSION_ID}.json`);
@@ -136,8 +160,10 @@ async function withStartedRuntime(
 							appSecret: "secret",
 							chatId: "oc_bound",
 							authorizedOpenIds: "ou_alice, ou_bob",
+							streaming: { enabled: streamingEnabled },
 						},
 					},
+					presentation: { redact: false, verbosity },
 				},
 			},
 			{
@@ -147,19 +173,20 @@ async function withStartedRuntime(
 						appSecret: "secret",
 						chatId: "oc_bound",
 						authorizedOpenIds: "ou_alice, ou_bob",
+						streaming: { enabled: streamingEnabled },
 					});
 					return provider;
 				},
 				routerDeps: {
 					createIndex: () => index,
-					createClient: async () => fakeRouterClient(frames),
+					createClient: async () => fakeRouterClient(frames, emit => emitFrameQueue.push(emit)),
 					setInterval: (() => 0) as unknown as typeof setInterval,
 					clearInterval: (() => undefined) as unknown as typeof clearInterval,
 				},
 			},
 		);
 		await runtime.start();
-		await run({ provider, runtime, frames });
+		await run({ provider, runtime, frames, emitFrame });
 	} finally {
 		await runtime?.stop();
 		await fs.rm(agentDir, { recursive: true, force: true });
@@ -246,6 +273,80 @@ describe("chat daemon runtime feishu-app branch", () => {
 					return Promise.resolve({ ok: true as const, messageId: undefined });
 				},
 			},
+		);
+	});
+
+	test("status lane renders a live card from frames and deletes it on the final answer", async () => {
+		await withStartedRuntime(async ({ provider, runtime, emitFrame }) => {
+			await runtime.reconcile({ waitForReplay: true });
+			emitFrame({ type: "tool_activity", toolName: "bash", phase: "started", sessionId: SESSION_ID });
+			for (let attempt = 0; attempt < 2_000 && provider.cards.length === 0; attempt++) await Bun.sleep(1);
+			expect(provider.cards).toHaveLength(1);
+			emitFrame({
+				type: "turn_stream",
+				phase: "finalized",
+				finalAnswer: true,
+				text: "构建通过了。",
+				sessionId: SESSION_ID,
+			});
+			for (let attempt = 0; attempt < 2_000 && provider.deletions.length === 0; attempt++) await Bun.sleep(1);
+			expect(provider.deletions).toEqual(["om_status_1"]);
+			expect(provider.updates).toHaveLength(0);
+		});
+	});
+
+	test("status lane suppresses mirrored live text but still delivers the answer", async () => {
+		const texts: string[] = [];
+		await withStartedRuntime(
+			async ({ provider, runtime, emitFrame }) => {
+				await runtime.reconcile({ waitForReplay: true });
+				for (let attempt = 0; attempt < 2_000 && texts.length === 0; attempt++) await Bun.sleep(1);
+				const bound = texts.length;
+				emitFrame({
+					type: "tool_activity",
+					toolName: "bash",
+					phase: "started",
+					text: "ls -la",
+					sessionId: SESSION_ID,
+				});
+				for (let attempt = 0; attempt < 2_000 && provider.cards.length === 0; attempt++) await Bun.sleep(1);
+				expect(provider.cards).toHaveLength(1);
+				// The card mirrors the live frame; the plain-text fanout must not
+				// double-post it even in verbose mode.
+				expect(texts.length).toBe(bound);
+				emitFrame({
+					type: "turn_stream",
+					phase: "finalized",
+					finalAnswer: true,
+					text: "答案正文",
+					sessionId: SESSION_ID,
+				});
+				for (let attempt = 0; attempt < 2_000 && texts.length <= bound; attempt++) await Bun.sleep(1);
+				expect(texts[texts.length - 1]).toContain("答案正文");
+				expect(provider.deletions).toEqual(["om_status_1"]);
+			},
+			{
+				sendText: (content?: string) => {
+					texts.push(content ?? "");
+					return Promise.resolve({ ok: true as const, messageId: undefined });
+				},
+			},
+			{ verbosity: "verbose" },
+		);
+	});
+
+	test("status lane disabled keeps live frames silent without a card", async () => {
+		await withStartedRuntime(
+			async ({ provider, runtime, emitFrame }) => {
+				await runtime.reconcile({ waitForReplay: true });
+				emitFrame({ type: "tool_activity", toolName: "bash", phase: "started", sessionId: SESSION_ID });
+				emitFrame({ type: "turn_stream", phase: "live", text: "流式输出", sessionId: SESSION_ID });
+				await Bun.sleep(50);
+				expect(provider.cards).toHaveLength(0);
+				expect(provider.deletions).toHaveLength(0);
+			},
+			{},
+			{ streamingEnabled: false },
 		);
 	});
 

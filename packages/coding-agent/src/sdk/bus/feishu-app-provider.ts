@@ -42,6 +42,8 @@ export interface FeishuAppProviderClient {
 	sendCard(card: Record<string, unknown>): Promise<FeishuAppDeliveryResult>;
 	/** Best-effort in-place card replacement (e.g. disabling answered buttons). */
 	updateCard(messageId: string, card: Record<string, unknown>): Promise<FeishuAppDeliveryResult>;
+	/** Best-effort removal of a bot-owned message (e.g. an ephemeral status card). */
+	deleteMessage(messageId: string): Promise<FeishuAppDeliveryResult>;
 }
 
 function readString(source: unknown, key: string): string | undefined {
@@ -274,6 +276,16 @@ export class FeishuAppLiveProvider implements FeishuAppProviderClient {
 			return this.#verdict(response, "card update");
 		} catch (error) {
 			return this.#failure(error, "card update", true);
+		}
+	}
+
+	async deleteMessage(messageId: string): Promise<FeishuAppDeliveryResult> {
+		const lark = this.#requireClient();
+		try {
+			const response = await lark.im.message.delete({ path: { message_id: messageId } });
+			return this.#verdict(response, "message delete");
+		} catch (error) {
+			return this.#failure(error, "message delete", true);
 		}
 	}
 

@@ -126,14 +126,27 @@ async function loadConfig(agentDir: string, kind: ChatDaemonKind): Promise<ChatD
 		}
 		const feishuApp = config["feishu-app"];
 		const { appId, appSecret, chatId, authorizedOpenIds } = feishuApp;
+		const streamingEnabled = feishuApp.streaming.enabled;
 		const identity = crypto
 			.createHash("sha256")
-			.update([appId, appSecret, chatId, authorizedOpenIds, String(config.redact), config.verbosity].join("\0"))
+			.update(
+				[
+					appId,
+					appSecret,
+					chatId,
+					authorizedOpenIds,
+					String(config.redact),
+					config.verbosity,
+					String(streamingEnabled),
+				].join("\0"),
+			)
 			.digest("hex")
 			.slice(0, 16);
 		return {
 			identity,
-			notifications: { "feishu-app": { appId, appSecret, chatId, authorizedOpenIds } },
+			notifications: {
+				"feishu-app": { appId, appSecret, chatId, authorizedOpenIds, streaming: { enabled: streamingEnabled } },
+			},
 			presentation: { redact: config.redact, verbosity: config.verbosity },
 		};
 	}

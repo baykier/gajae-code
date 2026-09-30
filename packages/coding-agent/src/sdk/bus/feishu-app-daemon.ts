@@ -58,6 +58,8 @@ export interface FeishuAppDaemonOptions {
 		attachment: SessionAttachment,
 		idempotencyKey: string,
 	) => Promise<boolean>;
+	/** Injectable clock for status-card throttling; defaults to wall time. */
+	now?: () => number;
 }
 
 function authorize(options: FeishuAppDaemonOptions, envelope: FeishuAppInboundEnvelope): boolean {
@@ -123,16 +125,111 @@ function resolvedCard(answer: string): Record<string, unknown> {
 	};
 }
 
+/** Feishu rate-limits card patches; live status redraws coalesce to at most one update per window. */
+const STATUS_CARD_UPDATE_MIN_MS = 3_000;
+/** Hard ceiling for one ephemeral status card; sessions without a finalized answer frame cannot linger forever. */
+const STATUS_CARD_MAX_AGE_MS = 10 * 60_000;
+/** A tool start after this much silence begins a fresh visual turn on the same card. */
+const STATUS_CARD_IDLE_RESET_MS = 60_000;
+const STATUS_CARD_TEXT_PREVIEW_CHARS = 280;
+const STATUS_CARD_LIMIT = 16;
+
+export interface FeishuAppStatusFrameInput {
+	sessionId: string;
+	endpointGeneration: number;
+	/** One additive session frame: `tool_activity`, `turn_stream`, or `context_update`. */
+	frame: Record<string, unknown>;
+}
+
+/**
+ * Live state behind one session's ephemeral status card. The card is created on
+ * the first status frame, redrawn in place at most once per update window, and
+ * deleted when the turn settles (final-answer frame or session close).
+ */
+interface StatusCardState {
+	readonly sessionId: string;
+	messageId: string | undefined;
+	/** When the card message was born; bounds its total lifetime (max age). */
+	createdAt: number;
+	startedAt: number;
+	lastActivityAt: number;
+	lastUpdateAt: number;
+	toolName: string | undefined;
+	toolOutcome: string | undefined;
+	toolAt: number | undefined;
+	text: string | undefined;
+	model: string | undefined;
+	tokenUsage: string | undefined;
+	dirty: boolean;
+	settled: boolean;
+	/** Serializes provider mutations so card patches can never land out of order. */
+	chain: Promise<void>;
+}
+
+export function formatStatusDuration(ms: number): string {
+	const totalSeconds = Math.max(0, Math.round(ms / 1000));
+	if (totalSeconds < 60) return `${totalSeconds}s`;
+	const minutes = Math.floor(totalSeconds / 60);
+	if (minutes < 60) return `${minutes}m${String(totalSeconds % 60).padStart(2, "0")}s`;
+	return `${Math.floor(minutes / 60)}h${String(minutes % 60).padStart(2, "0")}m`;
+}
+
+function statusCardLines(state: StatusCardState, now: number): string {
+	const lines: string[] = [];
+	if (state.toolName !== undefined) {
+		const mark =
+			state.toolOutcome === undefined || state.toolOutcome === "started"
+				? ""
+				: state.toolOutcome === "completed"
+					? "✓ "
+					: "✗ ";
+		const elapsed = state.toolAt !== undefined ? ` · ${formatStatusDuration(now - state.toolAt)}` : "";
+		lines.push(`工具 ${mark}\`${state.toolName}\`${elapsed}`);
+	}
+	if (state.text !== undefined) {
+		const preview = state.text
+			.replace(/[ \t]+\n/g, "\n")
+			.trim()
+			.slice(0, STATUS_CARD_TEXT_PREVIEW_CHARS);
+		if (preview.length > 0) lines.push(preview);
+	}
+	const meta = [state.model, state.tokenUsage].filter((entry): entry is string => entry !== undefined).join(" · ");
+	if (meta.length > 0) lines.push(meta);
+	lines.push(`已运行 ${formatStatusDuration(now - state.startedAt)}`);
+	return lines.join("\n");
+}
+
+/** The in-progress card: a compact terminal mirror of the live session state. */
+export function buildStatusCard(state: StatusCardState, now: number): Record<string, unknown> {
+	return {
+		config: { enable_forward: false },
+		header: { title: { tag: "plain_text", content: "GJC 运行中" }, template: "blue" },
+		elements: [{ tag: "div", text: { tag: "lark_md", content: statusCardLines(state, now) } }],
+	};
+}
+
+/** Fallback card when the ephemeral card cannot be deleted (e.g. outside Feishu's edit window). */
+export function settledStatusCard(elapsed: string): Record<string, unknown> {
+	return {
+		config: { enable_forward: false },
+		header: { title: { tag: "plain_text", content: "GJC 回合已结束" }, template: "grey" },
+		elements: [{ tag: "div", text: { tag: "lark_md", content: `已完成 · 耗时 ${elapsed}` } }],
+	};
+}
+
 export class FeishuAppNotificationDaemon {
 	readonly #options: FeishuAppDaemonOptions;
 	readonly #pending = new Map<string, PendingAction>();
 	readonly #delivered = new Set<string>();
+	readonly #statusCards = new Map<string, StatusCardState>();
+	readonly #now: () => number;
 	/** Most recent session that produced a delivery; routes free-form `/sdk` commands. */
 	#lastSessionId: string | undefined;
 	#started = false;
 
 	constructor(options: FeishuAppDaemonOptions) {
 		this.#options = options;
+		this.#now = options.now ?? (() => Date.now());
 	}
 
 	transportHealthy(): boolean {
@@ -168,6 +265,139 @@ export class FeishuAppNotificationDaemon {
 		const result = await this.#options.provider.sendText(input.content);
 		if (!result.ok) logger.warn(`Feishu app bot notify failed: ${result.detail}`);
 	}
+	/**
+	 * Consume one live session frame into the session's ephemeral status card.
+	 * The card is created on the first frame, redrawn in place at most once per
+	 * update window (Feishu rate-limits card patches), and deleted when the turn
+	 * settles. Every consumed frame marks the card dirty; frames inside the
+	 * update window coalesce into the next applied redraw.
+	 */
+	async statusFrame(input: FeishuAppStatusFrameInput): Promise<void> {
+		const frame = input.frame;
+		const now = this.#now();
+		const state = this.#statusCardState(input.sessionId, now);
+		if (frame.type === "turn_stream") {
+			if (frame.phase === "finalized") {
+				// A pre-ask lead-in also finalizes (finalAnswer:false) but the turn
+				// keeps running past it; only the final answer settles the card.
+				if (frame.finalAnswer !== true) return;
+				await this.#settleStatusCard(state, now);
+				return;
+			}
+			if (frame.phase !== "live") return;
+			if (typeof frame.text !== "string" || frame.text.length === 0) return;
+			state.text = frame.text;
+		} else if (frame.type === "tool_activity") {
+			const toolName = readString(frame, "toolName");
+			if (toolName === undefined) return;
+			const phase = readString(frame, "phase") ?? "started";
+			if (phase === "started" && now - state.lastActivityAt > STATUS_CARD_IDLE_RESET_MS) {
+				// A tool start after a long silence begins a fresh visual turn:
+				// the previous turn may have ended without a finalized answer.
+				state.startedAt = now;
+				state.text = undefined;
+			}
+			state.toolName = toolName;
+			state.toolOutcome = phase;
+			state.toolAt = phase === "started" ? now : (state.toolAt ?? now);
+		} else if (frame.type === "context_update") {
+			if (typeof frame.model !== "string" && typeof frame.tokenUsage !== "string") return;
+			if (typeof frame.model === "string") state.model = frame.model;
+			if (typeof frame.tokenUsage === "string") state.tokenUsage = frame.tokenUsage;
+		} else {
+			return;
+		}
+		state.lastActivityAt = now;
+		state.dirty = true;
+		await this.#flushStatusCard(state, now);
+	}
+
+	#statusCardState(sessionId: string, now: number): StatusCardState {
+		const existing = this.#statusCards.get(sessionId);
+		if (existing) return existing;
+		const state: StatusCardState = {
+			sessionId,
+			messageId: undefined,
+			createdAt: now,
+			startedAt: now,
+			lastActivityAt: now,
+			lastUpdateAt: 0,
+			toolName: undefined,
+			toolOutcome: undefined,
+			toolAt: undefined,
+			text: undefined,
+			model: undefined,
+			tokenUsage: undefined,
+			dirty: false,
+			settled: false,
+			chain: Promise.resolve(),
+		};
+		while (this.#statusCards.size >= STATUS_CARD_LIMIT) {
+			const oldest = this.#statusCards.keys().next().value;
+			if (oldest === undefined) break;
+			this.#statusCards.delete(oldest);
+		}
+		this.#statusCards.set(sessionId, state);
+		return state;
+	}
+
+	async #flushStatusCard(state: StatusCardState, now: number): Promise<void> {
+		if (state.settled) return;
+		if (now - state.createdAt > STATUS_CARD_MAX_AGE_MS) {
+			await this.#settleStatusCard(state, now);
+			return;
+		}
+		if (!state.dirty) return;
+		if (state.messageId === undefined) {
+			// First appearance is never throttled: the card must show up fast.
+			state.dirty = false;
+			state.lastUpdateAt = now;
+			const card = buildStatusCard(state, now);
+			state.chain = state.chain
+				.then(async () => {
+					const result = await this.#options.provider.sendCard(card);
+					if (result.ok) state.messageId = result.messageId ?? state.messageId;
+					else logger.warn(`Feishu app bot status card send failed: ${result.detail}`);
+				})
+				.catch(() => undefined);
+			await state.chain;
+			return;
+		}
+		if (now - state.lastUpdateAt < STATUS_CARD_UPDATE_MIN_MS) return; // dirty stays set; next frame redraws
+		state.dirty = false;
+		state.lastUpdateAt = now;
+		const messageId = state.messageId;
+		const card = buildStatusCard(state, now);
+		state.chain = state.chain
+			.then(async () => {
+				const result = await this.#options.provider.updateCard(messageId, card);
+				if (!result.ok) logger.warn(`Feishu app bot status card update failed: ${result.detail}`);
+			})
+			.catch(() => undefined);
+		await state.chain;
+	}
+
+	async #settleStatusCard(state: StatusCardState, now: number): Promise<void> {
+		if (state.settled) return;
+		state.settled = true;
+		this.#statusCards.delete(state.sessionId);
+		const messageId = state.messageId;
+		if (messageId === undefined) return;
+		const elapsed = formatStatusDuration(now - state.startedAt);
+		state.chain = state.chain
+			.then(async () => {
+				// The finalized answer arrives as its own message, so the card is
+				// transient by design; if Feishu refuses the delete (edit window),
+				// mute it to a settled state instead of leaving a stale spinner.
+				const deleted = await this.#options.provider.deleteMessage(messageId);
+				if (deleted.ok) return;
+				logger.warn(`Feishu app bot status card removal failed: ${deleted.detail}`);
+				const fallback = await this.#options.provider.updateCard(messageId, settledStatusCard(elapsed));
+				if (!fallback.ok) logger.warn(`Feishu app bot status card settle failed: ${fallback.detail}`);
+			})
+			.catch(() => undefined);
+		await state.chain;
+	}
 
 	async resolveAction(sessionId: string, actionId: string): Promise<void> {
 		const pending = this.#pending.get(actionId);
@@ -191,6 +421,8 @@ export class FeishuAppNotificationDaemon {
 	async close(sessionId: string, _generation: number): Promise<void> {
 		for (const [actionId, pending] of [...this.#pending])
 			if (pending.sessionId === sessionId) this.#pending.delete(actionId);
+		const statusCard = this.#statusCards.get(sessionId);
+		if (statusCard) await this.#settleStatusCard(statusCard, this.#now());
 	}
 
 	async retireAttachment(sessionId: string, _generation: number): Promise<void> {

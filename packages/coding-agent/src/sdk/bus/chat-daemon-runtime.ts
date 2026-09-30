@@ -39,7 +39,14 @@ export interface ChatDaemonRuntimeConfig {
 	notifications: {
 		discord?: { botToken: string; applicationId: string; guildId: string; parentChannelId: string };
 		slack?: { botToken: string; appToken: string; workspaceId: string; channelId: string; authorizedUserId?: string };
-		"feishu-app"?: { appId: string; appSecret: string; chatId: string; authorizedOpenIds: string };
+		"feishu-app"?: {
+			appId: string;
+			appSecret: string;
+			chatId: string;
+			authorizedOpenIds: string;
+			/** Live status cards (tool/text mirror) rendered as ephemeral Feishu cards. */
+			streaming: { enabled: boolean };
+		};
 	};
 	presentation?: { redact: boolean; verbosity: "lean" | "verbose" };
 }
@@ -132,6 +139,30 @@ export function publicationIdForFinalChatAnswer(sessionId: string, frame: Record
 	)
 		return undefined;
 	return `turn:${sessionId}:${frame.messageRef}`;
+}
+
+/** Frame types the feishu-app status lane renders on the ephemeral status card. */
+const STATUS_CARD_FRAME_TYPES: ReadonlySet<string> = new Set(["tool_activity", "turn_stream", "context_update"]);
+
+/**
+ * Frame types the feishu lane must NOT also deliver as plain text when the
+ * status card is active: the card already mirrors them, and double-posting
+ * would flood the chat. Finalized turn_stream frames stay deliverable — they
+ * are the answer surface the card is deleted for.
+ */
+const STATUS_CARD_TEXT_SUPPRESSED_FRAME_TYPES: ReadonlySet<string> = new Set([
+	"tool_activity",
+	"reasoning_summary",
+	"context_update",
+]);
+
+function isStatusCardFrameType(frame: Record<string, unknown>): boolean {
+	return typeof frame.type === "string" && STATUS_CARD_FRAME_TYPES.has(frame.type);
+}
+
+/** The feishu-app status lane is active only for a started daemon with streaming explicitly enabled. */
+function feishuAppStatusLaneEnabled(config: ChatDaemonRuntimeConfig): boolean {
+	return config.notifications["feishu-app"]?.streaming.enabled === true;
 }
 
 /** One delivered frame reduced to a single event identity. */
@@ -749,9 +780,21 @@ export class ChatDaemonRuntime {
 			publicationIdForFinalChatAnswer(attachment.sessionId, normalizedFrame) ?? correlated.publicationId;
 		const bodyType = typeof normalizedFrame.type === "string" ? normalizedFrame.type : undefined;
 		if (isControlPlaneFrameType(correlated.name) || isControlPlaneFrameType(bodyType)) return;
-		if (normalizedFrame.type === "turn_stream" && normalizedFrame.phase === "live") return;
+		// The feishu-app status lane consumes live frames itself (ephemeral status
+		// cards); without it, live turn_stream frames stay unreachable noise.
+		const feishuApp = this.#feishuApp;
+		const statusLane = feishuApp !== undefined && feishuAppStatusLaneEnabled(this.input.config);
+		if (!statusLane && normalizedFrame.type === "turn_stream" && normalizedFrame.phase === "live") return;
 		if (correlated.sessionId !== undefined && correlated.sessionId !== attachment.sessionId) return;
 		const sessionId = attachment.sessionId;
+		if (statusLane && isStatusCardFrameType(normalizedFrame))
+			this.#trackOutbound(
+				feishuApp.statusFrame({
+					sessionId,
+					endpointGeneration: attachment.generation,
+					frame: normalizedFrame,
+				}),
+			);
 		const name = correlated.name;
 		if (name === "session_closed" || name === "session_terminated") {
 			await this.#trackCleanup(attachment);
@@ -796,6 +839,14 @@ export class ChatDaemonRuntime {
 					: (body as Record<string, unknown>).text
 				: undefined;
 		if (typeof content !== "string") return;
+		// The status card already mirrors these frames for the feishu lane; the
+		// parallel text fanout would only double-post them. Finalized answers
+		// stay untouched — they are the message the card is deleted for.
+		const feishuStatusSuppressed =
+			statusLane &&
+			notification.type === "frame" &&
+			typeof normalizedFrame.type === "string" &&
+			STATUS_CARD_TEXT_SUPPRESSED_FRAME_TYPES.has(normalizedFrame.type);
 		if (this.#discord)
 			await this.#trackOutbound(
 				this.#discord.notify({
@@ -819,7 +870,7 @@ export class ChatDaemonRuntime {
 					publicationId,
 				),
 			);
-		if (this.#feishuApp)
+		if (this.#feishuApp && !feishuStatusSuppressed)
 			await this.#trackOutbound(
 				this.#feishuApp.notify({
 					sessionId,
