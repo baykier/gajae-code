@@ -5,6 +5,7 @@ import { writeBrokerDiscovery } from "../src/sdk/broker/discovery";
 import { SessionIndex } from "../src/sdk/broker/session-index";
 import {
 	ChatDaemonRuntime,
+	finalAnswerTurnPublicationId,
 	publicationIdForFinalChatAnswer,
 	shouldPublishChatFrame,
 } from "../src/sdk/bus/chat-daemon-runtime";
@@ -299,6 +300,28 @@ describe("chat daemon worker", () => {
 		expect(publicationIdForFinalChatAnswer("session", frame)).toBe("turn:session:assistant-message-1");
 		expect(publicationIdForFinalChatAnswer("session", { ...frame, finalAnswer: false })).toBeUndefined();
 		expect(publicationIdForFinalChatAnswer("session", { ...frame, messageRef: "" })).toBeUndefined();
+	});
+
+	it("collapses duplicate finalized answer deliveries onto the turn correlation key", () => {
+		const frame = { type: "turn_stream", phase: "finalized", finalAnswer: true, messageRef: "assistant-message-1" };
+		const positioned = finalAnswerTurnPublicationId("session", frame, { turnId: "turn-1", commandId: "cmd-1" });
+		const unpositionedTwin = finalAnswerTurnPublicationId(
+			"session",
+			{ ...frame, messageRef: undefined },
+			{
+				turnId: "turn-1",
+				commandId: "cmd-1",
+			},
+		);
+		expect(positioned).toBe("turn:session:turn-1");
+		expect(unpositionedTwin).toBe(positioned);
+		expect(
+			finalAnswerTurnPublicationId("session", { ...frame, finalAnswer: false }, { turnId: "turn-1" }),
+		).toBeUndefined();
+		expect(finalAnswerTurnPublicationId("session", { ...frame, messageRef: undefined }, { commandId: "cmd-2" })).toBe(
+			"turn:session:cmd-2",
+		);
+		expect(finalAnswerTurnPublicationId("session", { ...frame, messageRef: undefined }, {})).toBeUndefined();
 	});
 
 	it("creates a real configured runtime, maps event threads, routes safe replies, handles lifecycle transitions, and cleans up", async () => {

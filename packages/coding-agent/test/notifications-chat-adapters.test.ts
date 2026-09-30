@@ -69,6 +69,23 @@ describe("Discord and Slack notification adapters", () => {
 		}
 	});
 
+	test("final turn answers keep the frame-type header contract", () => {
+		const engine = new NotificationPresentationEngine([createDiscordAdapter(), createSlackAdapter()], {
+			redact: true,
+		});
+		const payloads = engine.fanout({
+			type: "frame",
+			sessionId: "session-abcdef",
+			frame: { type: "turn_stream", phase: "finalized", finalAnswer: true, text: "链路正常" },
+		});
+		expect(payloads.length).toBe(2);
+		for (const payload of payloads) {
+			const body = payload.body as Record<string, unknown>;
+			const rendered = `${body.content ?? ""}${body.text ?? ""}`;
+			expect(rendered).toBe("GJC turn stream\n链路正常");
+		}
+	});
+
 	test("ignore unknown or stale inbound replies", () => {
 		const engine = new NotificationPresentationEngine([createDiscordAdapter()], {
 			redact: false,

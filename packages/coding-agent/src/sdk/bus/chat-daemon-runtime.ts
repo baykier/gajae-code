@@ -141,6 +141,23 @@ export function publicationIdForFinalChatAnswer(sessionId: string, frame: Record
 	return `turn:${sessionId}:${frame.messageRef}`;
 }
 
+/**
+ * One answer per turn: duplicate finalized answer deliveries of one turn may
+ * disagree on the SDK message ref (the unpositioned twin can omit it), so the
+ * turn correlation is the stable dedup key. Returns undefined outside the
+ * final-answer shape.
+ */
+export function finalAnswerTurnPublicationId(
+	sessionId: string,
+	frame: Record<string, unknown>,
+	correlated: { turnId?: string; commandId?: string },
+): string | undefined {
+	if (frame.type !== "turn_stream" || frame.phase !== "finalized" || frame.finalAnswer !== true) return undefined;
+	const turnKey = correlated.turnId ?? correlated.commandId;
+	if (turnKey === undefined) return undefined;
+	return `turn:${sessionId}:${turnKey}`;
+}
+
 /** Frame types the feishu-app status lane renders on the ephemeral status card. */
 const STATUS_CARD_FRAME_TYPES: ReadonlySet<string> = new Set(["tool_activity", "turn_stream", "context_update"]);
 
@@ -777,7 +794,9 @@ export class ChatDaemonRuntime {
 		if (this.#attachments.get(attachment.sessionId) !== attachment) return;
 		const normalizedFrame = correlated.body;
 		const publicationId =
-			publicationIdForFinalChatAnswer(attachment.sessionId, normalizedFrame) ?? correlated.publicationId;
+			finalAnswerTurnPublicationId(attachment.sessionId, normalizedFrame, correlated) ??
+			publicationIdForFinalChatAnswer(attachment.sessionId, normalizedFrame) ??
+			correlated.publicationId;
 		const bodyType = typeof normalizedFrame.type === "string" ? normalizedFrame.type : undefined;
 		if (isControlPlaneFrameType(correlated.name) || isControlPlaneFrameType(bodyType)) return;
 		// The feishu-app status lane consumes live frames itself (ephemeral status
