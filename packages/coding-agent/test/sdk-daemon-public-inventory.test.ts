@@ -181,7 +181,7 @@ describe("static SDK/daemon public inventory", () => {
 		expect(command("daemon status").args.kind).toMatchObject({
 			required: false,
 			multiple: true,
-			options: ["telegram", "discord", "slack"],
+			options: ["telegram", "discord", "slack", "feishu-app"],
 		});
 	});
 

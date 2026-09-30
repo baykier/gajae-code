@@ -204,7 +204,7 @@ const daemonArgs = {
 	kind: argument("Daemon kinds (default: telegram); these are not SDK broker kinds.", {
 		required: false,
 		multiple: true,
-		options: ["telegram", "discord", "slack"],
+		options: ["telegram", "discord", "slack", "feishu-app"],
 	}),
 };
 
@@ -500,7 +500,7 @@ export const PUBLIC_COMMANDS: readonly PublicCommandDescriptor[] = [
 			risk: mutation ? daemonRisk : undefined,
 			recovery: mutation ? mutationRecovery : safeRecovery,
 			constraints: [
-				"Known kinds: telegram, discord, slack. No kind defaults to telegram; --all selects all registered kinds.",
+				"Known kinds: telegram, discord, slack, feishu-app. No kind defaults to telegram; --all selects all registered kinds.",
 				...(action === "reload" ? ["reload is an alias of restart, not a distinct operation."] : []),
 			],
 			example: `gjc daemon ${action} telegram --json`,

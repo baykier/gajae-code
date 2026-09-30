@@ -185,7 +185,7 @@ function safeReferences(references: readonly EvidenceReference[] | undefined): E
 		.map(ref => ({ kind: ref.kind, value: ref.value }));
 }
 const DAEMON_STATUS_TEXT_BYTES = 128;
-const DAEMON_KINDS = ["telegram", "discord", "slack"] as const;
+const DAEMON_KINDS = ["telegram", "discord", "slack", "feishu-app"] as const;
 const DAEMON_HEALTHS = ["not_configured", "stopped", "running", "stale", "stopping", "error"] as const;
 
 function boundedUtf8(value: string, maxBytes: number): string {
@@ -303,7 +303,7 @@ export function classifyPublicCommandFailure(
 					? "not-applied"
 					: "unknown";
 		// Only the bounded allowlisted target identity and typed outcome are rendered.
-		for (const daemonKind of ["telegram", "discord", "slack"] as const) {
+		for (const daemonKind of ["telegram", "discord", "slack", "feishu-app"] as const) {
 			const matches = targets?.filter(target => target.kind === daemonKind);
 			if (!matches?.length) continue;
 			const outcome = matches.every(target => target.outcome === "applied")

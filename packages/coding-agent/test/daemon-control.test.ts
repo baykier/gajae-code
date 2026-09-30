@@ -224,10 +224,11 @@ describe("static built-in controller map", () => {
 	test("createBuiltInDaemonControllers exposes every built-in kind", () => {
 		const s = settings(tempAgentDir());
 		const map = createBuiltInDaemonControllers(s);
-		expect(Object.keys(map)).toEqual(["telegram", "discord", "slack"]);
+		expect(Object.keys(map)).toEqual(["telegram", "discord", "slack", "feishu-app"]);
 		expect(map.telegram).toBeInstanceOf(TelegramDaemonController);
 		expect(map.discord).toBeInstanceOf(ChatDaemonController);
 		expect(map.slack).toBeInstanceOf(ChatDaemonController);
+		expect(map["feishu-app"]).toBeInstanceOf(ChatDaemonController);
 	});
 
 	test("selectDaemonControllers defaults to Telegram, selects all kinds, and rejects unknown kinds", () => {
@@ -238,6 +239,7 @@ describe("static built-in controller map", () => {
 			"telegram",
 			"discord",
 			"slack",
+			"feishu-app",
 		]);
 		expect(() => selectDaemonControllers(s, ["mystery" as never], false)).toThrow(/unknown daemon kind/);
 	});
@@ -888,7 +890,7 @@ describe("TelegramDaemonController.reload", () => {
 			message: "Public command failed",
 			input: { kind: "operation_failed", proof: "pre-effect" },
 			kinds: ["bogus"],
-			knownKinds: ["telegram", "discord", "slack"],
+			knownKinds: ["telegram", "discord", "slack", "feishu-app"],
 		});
 	});
 
