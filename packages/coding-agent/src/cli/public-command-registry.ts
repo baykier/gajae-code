@@ -461,7 +461,7 @@ export const PUBLIC_COMMANDS: readonly PublicCommandDescriptor[] = [
 	node("sdk guides status", { description: "Report guide cache and selection status.", flags: sessionFlags }),
 	node("sdk guides trust", { description: "Show the static guide trust policy; no refresh or cache mutation." }),
 	node("daemon", {
-		description: "Manage Telegram, Discord and Slack background daemons, not the SDK broker.",
+		description: "Manage Telegram, Discord, Slack and Feishu app background daemons, not the SDK broker.",
 		children: DAEMON_ACTION_TOKENS,
 		defaultChild: "status",
 		args: daemonArgs,
