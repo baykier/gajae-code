@@ -149,8 +149,8 @@ export type ChatDaemonAction = "stop" | "reload";
  * (WS long-connection inbound) on the shared chat-daemon control plane.
  */
 export const CHAT_DAEMON_GENERATIONS: Readonly<Record<ChatDaemonKind, number>> = {
-	discord: 81,
-	slack: 88,
+	discord: 82,
+	slack: 89,
 	"feishu-app": 1,
 };
 

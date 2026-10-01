@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+## [0.18.5] - 2026-09-30
+
+## [0.18.4] - 2026-09-30
+
+## [0.18.3] - 2026-09-30
+
+## [0.18.2] - 2026-09-30
+
+### Fixed
+
+- Fixed flaky thread count assertion in walker pool unavailability test by moving the before-measurement snapshot to immediately before the glob operation, minimizing the time window for unrelated Bun/Tokio background workers to spawn and ensuring the measurement reflects only thread changes caused by the glob itself.
+
+- Restored TypeScript/TSX highlighting speed: `ts`/`tsx` go back to syntect's JavaScript grammar instead of the pinned upstream TypeScript grammars, which made first-use syntax loading ~60x slower (~600ms) and each TypeScript highlight ~3x slower (diff rendering 48ms → 160ms on an 86-hunk edit). Astro frontmatter and expressions now embed the JavaScript grammar.
+
 ## [0.18.1] - 2026-09-29
 
 ### Fixed

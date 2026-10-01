@@ -5,11 +5,11 @@
  * config root and GJC_CODING_AGENT_DIR (legacy alias PI_CODING_AGENT_DIR) to
  * override the agent directory.
  *
- * On Linux, if XDG_DATA_HOME / XDG_STATE_HOME / XDG_CACHE_HOME environment
- * variables are set, paths are redirected to XDG-compliant locations under
- * $XDG_*_HOME/gjc/. This requires running `gjc config migrate` first to
- * move data to the new locations. No filesystem existence checks are performed
- * — if the env var is set, gjc trusts that the migration has been done.
+ * On Linux and macOS, a category (data, state, cache) is redirected to
+ * $XDG_*_HOME/gjc/ only when the trusted XDG_*_HOME variable is set, the
+ * $XDG_*_HOME/gjc directory already exists (`gjc config init-xdg` creates it),
+ * and the agent directory is the default. Otherwise paths stay under the config
+ * root. `init-xdg` only creates the directories; existing data is not moved.
  */
 
 import * as fs from "node:fs";

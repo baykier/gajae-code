@@ -2,6 +2,32 @@
 
 ## [Unreleased]
 
+## [0.18.5] - 2026-09-30
+
+## [0.18.4] - 2026-09-30
+
+## [0.18.3] - 2026-09-30
+
+## [0.18.2] - 2026-09-30
+
+### Added
+
+- Bundled Claude Sonnet 5.5: `anthropic/claude-sonnet-5-5` and Amazon Bedrock `anthropic.claude-sonnet-5-5` (plus `au.`/`eu.`/`global.`/`jp.`/`us.` inference profiles), with 1M context, 128K output, and $2/$10 per MTok pricing (#6111).
+
+- Bundled GPT-6.1 Sol for the Codex provider: `openai-codex/gpt-6.1-sol` (272K context, 128K output, reasoning effort low..max) with $2/$10 per MTok and $0.10 cached-input pricing (#6147). Presets and model-profile defaults are unchanged.
+
+### Removed
+
+- Removed `installH2Fetch`. Bun's HTTP/2 client can wedge a pooled connection while uploading a large request body (~300 KB, a typical long agent context): every later request on that connection waits indefinitely for response headers. All `fetch()` traffic now uses HTTP/1.1.
+
+### Fixed
+
+- A large (≥1 MB) request to a custom Anthropic-compatible endpoint is now retried when its connection drops before any response (ECONNRESET, socket closed, `Connection error`). Previously the one-upload ceiling meant for first-event stalls also covered these failures, so a single network blip ended the turn. Server responses (e.g. 529) and first-event timeouts still respect the ceiling (#6072).
+
+- Kiro (OAuth CodeWhisperer transport) now replays earlier tool calls as structured `toolUses` and sends each tool result as `{ toolUseId, status, content: [{ text }] }`, linked to the call it answers, instead of serializing calls into assistant text and nesting results. Parallel tool results share one history entry, and image results are marked `[image omitted]` rather than sent empty (#6079).
+
+- OpenAI-compatible completions requests now log OpenAI SDK connection timeouts and retries to the gjc log. Previously a request stalled before response headers retried silently for up to several minutes.
+
 ## [0.18.1] - 2026-09-29
 
 ### Changed

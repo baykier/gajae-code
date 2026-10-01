@@ -946,10 +946,15 @@ jobs:
                     # npm is read-after-write eventually consistent: re-observe
                     # until the sealed integrity is visible. 0.15.4 proved 60s is
                     # not enough (agent-core became visible only after the window
-                    # elapsed, failing an otherwise clean publish); allow up to 10
-                    # minutes of wall time, transfer time included, so a stalled
-                    # registry cannot stretch the window.
-                    deadline=$((SECONDS + 600))
+                    # elapsed, failing an otherwise clean publish), and v0.18.3
+                    # proved 600s is not enough either: the 110MB win32-x64
+                    # native was published at 09:47:26 but only became visible at
+                    # 09:59:40, blowing the window by 2m11s AFTER five sibling
+                    # packages had already gone immutable, which stranded the
+                    # release. Size this for the slowest plausible replica (large
+                    # Windows natives) rather than the median package, and keep
+                    # the window bounded so a truly stalled registry still fails.
+                    deadline=$((SECONDS + 1800))
                     while :; do
                        observed="$(registry_integrity "$name" "$version")"
                        [ "$observed" = "$expected_sri" ] && break

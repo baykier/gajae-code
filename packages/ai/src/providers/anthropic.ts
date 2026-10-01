@@ -1764,6 +1764,23 @@ function isTransientStreamEnvelopeError(error: unknown): boolean {
 	);
 }
 
+/**
+ * A request whose connection failed before the server returned any response:
+ * the SDK's connection error, or a reset/closed/refused socket with no HTTP status.
+ */
+function isPreResponseConnectionFailure(error: unknown): boolean {
+	if (!(error instanceof Error)) return false;
+	if (extractHttpStatusFromError(error) !== undefined) return false;
+	if (error instanceof Anthropic.APIConnectionTimeoutError) return false;
+	if (error instanceof Anthropic.APIConnectionError) return true;
+	const code = (error as { code?: unknown }).code;
+	if (typeof code === "string" && /^(?:ECONNRESET|ECONNREFUSED|EPIPE|ENOTFOUND|EAI_AGAIN)$/.test(code)) return true;
+	return (
+		isUnexpectedSocketCloseMessage(error.message) ||
+		/\b(?:ECONNRESET|ECONNREFUSED|EPIPE)\b|^connection error\.?$|other side closed/i.test(error.message)
+	);
+}
+
 function isProviderRetryableStreamEnvelopeError(error: unknown): boolean {
 	if (!(error instanceof Error)) return false;
 	return /stream event order|before message_start/i.test(error.message);
@@ -2672,7 +2689,14 @@ export const streamAnthropic: StreamFunction<"anthropic-messages"> = (
 					// Otherwise the multi-megabyte body is re-uploaded up to the default
 					// streamMaxRetries budget despite the ceiling. Once iteration has
 					// begun, only the grace-clock path above decides.
-					if (requestUploadCeilingBound && firstEventWaitStartedAt === undefined) {
+					// A connection that dropped before any response (reset, socket closed,
+					// connect failure) is exempt: the server never answered, so a retry is
+					// not a re-upload after a stall, and a network blip must not end the turn.
+					if (
+						requestUploadCeilingBound &&
+						firstEventWaitStartedAt === undefined &&
+						!isPreResponseConnectionFailure(streamFailure)
+					) {
 						Object.assign(streamFailure as Error, {
 							requestBytes,
 							endpointClass,

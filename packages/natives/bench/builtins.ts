@@ -14,10 +14,23 @@ function quoteShellString(value: string): string {
 	return `'${value.replaceAll("'", "'\\''")}'`;
 }
 
+// Every Shell.run pays a fixed ~90ms (on a busy host) for the descendant
+// baseline scan of the whole process session, on the pre-port base and on dev
+// alike. That floor and its variance would drown one builtin call, so each
+// sample loops the builtin LOOP times inside one command (the builtin work is
+// then ~100-230ms) and checks the exact repeated stdout.
+const LOOP = 5000;
+
+function looped(command: string): string {
+	// Counter loop built only from builtins: `$(seq ...)` would spawn an external
+	// process per sample and add its fork/exec variance to every measurement.
+	return `__builtins_ab_i=0; while [ "$__builtins_ab_i" -lt ${LOOP} ]; do ${command}; __builtins_ab_i=$((__builtins_ab_i + 1)); done`;
+}
+
 async function runBuiltin(command: string, expectedStdout: string): Promise<void> {
 	let stdout = "";
 	let callbackError: Error | undefined;
-	const result = await shell.run({ command, timeoutMs: 5_000 }, (error, chunk) => {
+	const result = await shell.run({ command: looped(command), timeoutMs: 30_000 }, (error, chunk) => {
 		if (error) callbackError = error;
 		else stdout += chunk;
 	});
@@ -25,8 +38,8 @@ async function runBuiltin(command: string, expectedStdout: string): Promise<void
 	if (result.exitCode !== 0 || result.cancelled || result.timedOut) {
 		throw new Error(`Builtin command failed: ${JSON.stringify(result)}`);
 	}
-	if (stdout !== expectedStdout) {
-		throw new Error(`Unexpected stdout: expected ${JSON.stringify(expectedStdout)}, received ${JSON.stringify(stdout)}`);
+	if (stdout !== expectedStdout.repeat(LOOP)) {
+		throw new Error(`Unexpected stdout: expected ${LOOP}x ${JSON.stringify(expectedStdout)}, received ${JSON.stringify(stdout.slice(0, 200))}`);
 	}
 }
 
@@ -90,7 +103,7 @@ const cases = [
 ];
 
 try {
-	await runAbSuite("builtins", cases, 10);
+	await runAbSuite("builtins", cases, 20);
 } finally {
 	try {
 		await shell.close();

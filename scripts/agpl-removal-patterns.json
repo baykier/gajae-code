@@ -57,6 +57,11 @@
 			"type": "file",
 			"pattern": "scripts/agpl-removal-patterns.json",
 			"reason": "The audit configuration must name the signatures it rejects."
+		},
+		{
+			"type": "file",
+			"pattern": "scripts/verify-doc-source-paths.ts",
+			"reason": "The doc-citation allowlist must name the deleted paths it exempts."
 		}
 	]
 }

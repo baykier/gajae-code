@@ -24425,8 +24425,15 @@ export class AgentSession {
 		if (!managedFallback && assistantMessageHasVisibleOrToolContent(message)) {
 			return false;
 		}
+		const canReplayUnexpectedSocketClose =
+			classification === "transient" &&
+			isUnexpectedSocketCloseMessage(message.errorMessage ?? "") &&
+			!hasBareDefaultRetryDisqualifyingFacts(message) &&
+			this.#hasCleanRetryReplaySafety;
 		// Bare defaults retain their narrow watchdog and provider capacity-overload
-		// admissions. A first-event timeout adds the typed, content-free,
+		// admissions. A content-free unexpected socket close is replay-safe when
+		// the attempt has no conflicting facts and the retry scope is clean. A
+		// first-event timeout adds the typed, content-free,
 		// current-clean-scope requirement above; other transient watchdogs preserve
 		// legacy behavior. A provider overload is admitted only from that provider's
 		// own typed overload code on a content-free attempt carrying no conflicting
@@ -24435,12 +24442,16 @@ export class AgentSession {
 		if (!managedFallback && !legacyRetryConfigured && !canReplayRotatedCredential && !canReplayEmptyResponse) {
 			if (
 				(!canReplayProviderOverload &&
+					!canReplayUnexpectedSocketClose &&
 					!this.#isTypedFirstEventTimeout(message) &&
 					!messageOnlyWatchdogTimeout &&
 					(hasBareDefaultRetryDisqualifyingFacts(message) ||
 						(classification !== "transient" && classification !== "first_event_timeout") ||
 						!BARE_DEFAULT_WATCHDOG_ERROR.test(message.errorMessage ?? ""))) ||
-				(!firstEventTimeout && !messageOnlyWatchdogTimeout && !this.#hasCleanRetryReplaySafety)
+				(!firstEventTimeout &&
+					!messageOnlyWatchdogTimeout &&
+					!canReplayUnexpectedSocketClose &&
+					!this.#hasCleanRetryReplaySafety)
 			) {
 				return false;
 			}
@@ -24449,6 +24460,7 @@ export class AgentSession {
 			!managedFallback &&
 			classification === "transient" &&
 			!canReplayProviderOverload &&
+			!canReplayUnexpectedSocketClose &&
 			!this.#isIdleStreamStallErrorMessage(message.errorMessage ?? "");
 
 		const failedSelector = managedFallback ? controller.currentSelector() : undefined;

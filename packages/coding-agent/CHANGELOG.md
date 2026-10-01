@@ -2,6 +2,66 @@
 
 ## [Unreleased]
 
+## [0.18.5] - 2026-09-30
+
+## [0.18.4] - 2026-09-30
+
+## [0.18.3] - 2026-09-30
+
+## [0.18.2] - 2026-09-30
+
+### Added
+
+- Added the additive `codex-sol61` built-in model profile for GPT-6.1 Sol.
+
+### Changed
+
+- Built-in `claude-opus` and `claude-fable` executor roles and the `opus-codex` planner role now use `anthropic/claude-sonnet-5-5` instead of `anthropic/claude-sonnet-5` (#6111).
+
+### Fixed
+
+- Bare line-number and hash-only hashline anchors now fail with actionable, copy-ready full-anchor suggestions; edits remain unapplied until a full anchor is supplied.
+
+- On macOS, the shell runtime no longer exits with code 70 when spawning fast-exiting child processes or entitled/setuid children (like `/bin/ps`, `/usr/bin/top`, `sudo`) that cannot be queried for unique identity. When a child is confirmed absent or terminated before observation, the process identity is recorded like on Linux. Only genuine integrity failures (ledger write failures, HMAC errors) trigger exit 70 on a live child (#6085).
+
+- Exa MCP tool-call responses are formatted in bounded time. `formatGenericResponse` re-indents the entire formatted subtree at every object level, so cost grew super-linearly with nesting depth: 500/1000/2000/4000/8000 levels cost 60ms/227ms/730ms/5.9s/94s, and 20000 levels exhausted the call stack. The payload is whatever the remote MCP server returned, and the 16 MiB content cap does not bound depth — 8000 levels of `{"a":` is under 47 KB. Depth is now limited to 64, matching the session-import walker, and output for payloads within that limit is unchanged.
+
+- Preserve the one-line hashline retry hint when copied text contains literal `..`, while keeping ambiguous range edits rejected without modifying the file (#6112).
+
+- Nested `gjc` commands run through the Bash tool inside a managed-owner (tmux-supervised) session no longer fail with `managed_owner_admission_metadata_invalid`: the Bash boundary now scrubs the whole managed-owner env family, including the tmux owner server key and `GJC_TMUX_LAUNCHED`, instead of leaving a partial owner context behind (#6140).
+
+- Keep the ACP prompt watchdog on its awaiting-model bound until a streamed tool call actually begins executing.
+
+- Sessions without explicit `retry.*` settings now retry a content-free "socket connection was closed unexpectedly" (`ECONNRESET`) failure when the attempt is replay-safe, bounded by `retry.maxRetries`. Previously the bare-default gate only admitted stream-timeout watchdog errors, so a transient connection reset before any response ended the turn even though it was classified as transient.
+
+- Fixed sessions intermittently hanging after a tool call on long contexts (seen with OpenGateway `-ultrafast` models). The CLI no longer routes `fetch()` through Bun's HTTP/2 client, which could stall a pooled connection on large request bodies until the process restarted.
+
+- A long-running session whose `gjc` binary was replaced on disk no longer respawns the shared SDK broker over and over. Broker recovery now stops and asks for a session restart when this process's runtime image was replaced (same path, new file identity) or removed, and repeated recovery failures back off exponentially up to a cap instead of retrying every 30–60 seconds. Other clients sharing the broker are no longer disrupted by the churn (#6040).
+
+- Model registry refreshes no longer rescan and re-lowercase the whole model catalog for every registry-profile selector; selector matching uses a prebuilt index.
+
+- Validating cached model-preset registry documents is about a third faster: canonical JSON serialization no longer calls `JSON.stringify` for strings that need no escaping and checks surrogates with the native well-formedness test.
+
+- A session sharing its managed scope with another `gjc` process (for example a master session and the SDK session it spawned) no longer stops persisting with `managed_replace_receipt_cleanup_pending:quarantine_collision` when both processes try to retire the same replacement cleanup receipt at the same time. The process that loses the race to claim the retirement slot now leaves the receipt for a later reconciliation, and its own session write continues.
+
+- Keep SDK prompts alive when transient directed delivery back-pressure (`writer_backlog_full`) drops a correlated progress frame. Previously the prompt was abandoned while the run kept executing, so the final `agent_end` was dropped and ACP clients only settled the prompt when the prompt watchdog expired. Terminal frames now retry briefly under back-pressure so the prompt settles normally.
+- Release the prompt submission and work lease when terminal delivery still fails after the retry window, while preserving the `delivery_failed` terminal outcome.
+
+- Keep SDK and ACP prompts alive when a streaming message snapshot exceeds the directed frame limit, and report a correlated delivery failure to the requester only when the undeliverable frame is the run's own terminal, so a prompt is never reported failed while its execution is still running.
+- Preserve assistant text shape and terminal truncation metadata when bounding oversized correlated frames.
+- Preserve as much aggregate assistant message_end text as fits, including ordered text blocks.
+
+- Give broker-admitted lifecycle launches without a worktree a fresh child readiness budget after bounded pre-spawn bookkeeping, while preserving caller-supplied exact deadlines.
+- Bound broker-derived non-worktree pre-spawn preparation by the unused admission window (10s without queueing at default readiness), so fresh readiness still finishes inside the unchanged caller deadline.
+
+- Exit lifecycle session hosts cleanly after publishing a complete rollback receipt at the readiness cutoff.
+
+- Prove broker-owned session hosts have exited at readiness cutoff before returning retryable startup failures, including hosts blocked during extension initialization.
+
+- `gjc stats --json` now writes only the JSON document to stdout, so `gjc stats --json | jq ...` works. The `Synced N new entries ...` summary goes to stderr in JSON mode, alongside the sync progress. The dashboard and `--summary` output are unchanged.
+
+- Interactive `/ssh add ... --port` rejects a port with trailing or non-digit characters (for example `22oops` or `2222.5`) instead of saving the digits before them, matching the ACP `/ssh add` parser.
+
 ## [0.18.1] - 2026-09-29
 
 ### Fixed

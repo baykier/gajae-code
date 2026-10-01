@@ -93,6 +93,13 @@ export const BUILTIN_MODEL_PROFILES: readonly ModelProfileDefinition[] = [
 		critic: "openai-codex/gpt-6-sol:max",
 		architect: "openai-codex/gpt-6-sol:xhigh",
 	}),
+	profile("codex-sol61", ["openai-codex"], {
+		default: "openai-codex/gpt-6.1-sol:medium",
+		executor: "openai-codex/gpt-6.1-sol:medium",
+		planner: "openai-codex/gpt-6.1-sol:high",
+		critic: "openai-codex/gpt-6.1-sol:xhigh",
+		architect: "openai-codex/gpt-6-astra:xhigh",
+	}),
 	profile("lunamaxxing", ["openai-codex"], {
 		default: "openai-codex/gpt-6-luna:medium",
 		executor: "openai-codex/gpt-6-luna:xhigh",
@@ -256,14 +263,14 @@ export const BUILTIN_MODEL_PROFILES: readonly ModelProfileDefinition[] = [
 	}),
 	profile("claude-opus", ["anthropic"], {
 		default: ["anthropic/claude-opus-5-5:medium", "anthropic/claude-opus-4-6:xhigh"],
-		executor: "anthropic/claude-sonnet-5",
+		executor: "anthropic/claude-sonnet-5-5",
 		planner: ["anthropic/claude-opus-5-5:medium", "anthropic/claude-opus-4-6:low"],
 		critic: ["anthropic/claude-opus-5-5:high", "anthropic/claude-opus-4-6:high"],
 		architect: ["anthropic/claude-opus-5-5:high", "anthropic/claude-opus-4-6:xhigh"],
 	}),
 	profile("claude-fable", ["anthropic"], {
 		default: "anthropic/claude-fable-5-1:xhigh",
-		executor: "anthropic/claude-sonnet-5",
+		executor: "anthropic/claude-sonnet-5-5",
 		planner: "anthropic/claude-fable-5-1:low",
 		critic: "anthropic/claude-fable-5-1:high",
 		architect: "anthropic/claude-fable-5-1:xhigh",
@@ -491,7 +498,7 @@ export const BUILTIN_MODEL_PROFILES: readonly ModelProfileDefinition[] = [
 	profile("opus-codex", ["anthropic", "openai-codex"], {
 		default: "anthropic/claude-opus-5-5:medium",
 		executor: "openai-codex/gpt-5.6-terra:low",
-		planner: "anthropic/claude-sonnet-5",
+		planner: "anthropic/claude-sonnet-5-5",
 		critic: "openai-codex/gpt-6-sol:xhigh",
 		architect: "openai-codex/gpt-6-sol:high",
 	}),
@@ -555,6 +562,7 @@ const PROFILE_PRESENTATION: Record<string, ModelProfilePresentation> = {
 	"codex-eco": { displayName: "Codex Eco", providerGroup: "CODEX" },
 	"codex-medium": { displayName: "Codex Medium", providerGroup: "CODEX" },
 	"codex-pro": { displayName: "Codex Pro", providerGroup: "CODEX" },
+	"codex-sol61": { displayName: "Codex Sol 6.1", providerGroup: "CODEX" },
 	lunamaxxing: { displayName: "LunaMaxxing", providerGroup: "CODEX" },
 	"astra-lite": { displayName: "ASTRA-Lite", providerGroup: "CODEX" },
 	"astra-default": { displayName: "ASTRA-Default", providerGroup: "CODEX" },

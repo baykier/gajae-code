@@ -22,7 +22,7 @@ type Role = "default" | "executor" | "planner" | "critic" | "architect";
 
 const roles: Role[] = ["default", "executor", "planner", "critic", "architect"];
 const astraProfileNames = ["astra-lite", "astra-default", "astra-heavy", "astra-fable", "astra-fable-opus"] as const;
-const astraProfileNameSet = new Set<string>(astraProfileNames);
+const additiveProfileNames = new Set<string>([...astraProfileNames, "codex-sol61"]);
 
 const expectedProfiles: Array<{
 	name: string;
@@ -60,6 +60,17 @@ const expectedProfiles: Array<{
 			planner: "openai-codex/gpt-6-sol:high",
 			critic: "openai-codex/gpt-6-sol:max",
 			architect: "openai-codex/gpt-6-sol:xhigh",
+		},
+	},
+	{
+		name: "codex-sol61",
+		requiredProviders: ["openai-codex"],
+		mapping: {
+			default: "openai-codex/gpt-6.1-sol:medium",
+			executor: "openai-codex/gpt-6.1-sol:medium",
+			planner: "openai-codex/gpt-6.1-sol:high",
+			critic: "openai-codex/gpt-6.1-sol:xhigh",
+			architect: "openai-codex/gpt-6-astra:xhigh",
 		},
 	},
 	{
@@ -320,7 +331,7 @@ const expectedProfiles: Array<{
 		requiredProviders: ["anthropic"],
 		mapping: {
 			default: ["anthropic/claude-opus-5-5:medium", "anthropic/claude-opus-4-6:xhigh"],
-			executor: "anthropic/claude-sonnet-5",
+			executor: "anthropic/claude-sonnet-5-5",
 			planner: ["anthropic/claude-opus-5-5:medium", "anthropic/claude-opus-4-6:low"],
 			critic: ["anthropic/claude-opus-5-5:high", "anthropic/claude-opus-4-6:high"],
 			architect: ["anthropic/claude-opus-5-5:high", "anthropic/claude-opus-4-6:xhigh"],
@@ -331,7 +342,7 @@ const expectedProfiles: Array<{
 		requiredProviders: ["anthropic"],
 		mapping: {
 			default: "anthropic/claude-fable-5-1:xhigh",
-			executor: "anthropic/claude-sonnet-5",
+			executor: "anthropic/claude-sonnet-5-5",
 			planner: "anthropic/claude-fable-5-1:low",
 			critic: "anthropic/claude-fable-5-1:high",
 			architect: "anthropic/claude-fable-5-1:xhigh",
@@ -673,7 +684,7 @@ const expectedProfiles: Array<{
 		mapping: {
 			default: "anthropic/claude-opus-5-5:medium",
 			executor: "openai-codex/gpt-5.6-terra:low",
-			planner: "anthropic/claude-sonnet-5",
+			planner: "anthropic/claude-sonnet-5-5",
 			critic: "openai-codex/gpt-6-sol:xhigh",
 			architect: "openai-codex/gpt-6-sol:high",
 		},
@@ -792,7 +803,7 @@ function substituteCodexFamily(selector: string, source: "sol" | "terra", target
 const fixedNonCodexComboMappings: Record<string, Partial<Record<Role, string>>> = {
 	"opus-codex": {
 		default: "anthropic/claude-opus-5-5:medium",
-		planner: "anthropic/claude-sonnet-5",
+		planner: "anthropic/claude-sonnet-5-5",
 	},
 	"codex-opencodego": {
 		executor: "opencode-go/deepseek-v4-pro",
@@ -816,15 +827,15 @@ const fixedNonCodexComboMappings: Record<string, Partial<Record<Role, string>>> 
 };
 
 describe("built-in model profile catalog", () => {
-	test("contains exact 63-profile matrix cell-for-cell without replacing prior presets", () => {
-		expect(expectedProfiles).toHaveLength(63);
+	test("contains exact 64-profile matrix cell-for-cell without replacing prior presets", () => {
+		expect(expectedProfiles).toHaveLength(64);
 		expect(BUILTIN_MODEL_PROFILES.map(profile => profile.name)).toEqual(
 			expectedProfiles.map(profile => profile.name),
 		);
-		const priorExpectedProfiles = expectedProfiles.filter(profile => !astraProfileNameSet.has(profile.name));
+		const priorExpectedProfiles = expectedProfiles.filter(profile => !additiveProfileNames.has(profile.name));
 		expect(priorExpectedProfiles).toHaveLength(58);
 		expect(
-			BUILTIN_MODEL_PROFILES.filter(profile => !astraProfileNameSet.has(profile.name)).map(profile => ({
+			BUILTIN_MODEL_PROFILES.filter(profile => !additiveProfileNames.has(profile.name)).map(profile => ({
 				name: profile.name,
 				requiredProviders: profile.requiredProviders,
 				mapping: profile.modelMapping,
@@ -1103,6 +1114,7 @@ describe("built-in model profile catalog", () => {
 			"astra-lite": "ASTRA-Lite",
 			"astra-default": "ASTRA-Default",
 			"astra-heavy": "ASTRA-Heavy",
+			"codex-sol61": "Codex Sol 6.1",
 		})) {
 			expect(getModelProfilePresentation(name)).toEqual({ displayName, providerGroup: "CODEX" });
 		}
@@ -1139,6 +1151,7 @@ describe("built-in model profile catalog", () => {
 			"codex-eco",
 			"codex-medium",
 			"codex-pro",
+			"codex-sol61",
 			"lunamaxxing",
 		]);
 		expect(

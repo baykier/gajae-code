@@ -82,6 +82,11 @@ function fakeRegistry(options?: { missingProviders?: string[]; profiles?: ModelP
 				minLevel: ThinkingLevel.Low,
 				maxLevel: ThinkingLevel.Max,
 			}),
+			model("openai-codex", "gpt-6.1-sol", {
+				mode: "effort",
+				minLevel: ThinkingLevel.Low,
+				maxLevel: ThinkingLevel.Max,
+			}),
 			model("openai-codex", "gpt-5.6-terra", {
 				mode: "effort",
 				minLevel: ThinkingLevel.Low,
@@ -109,6 +114,7 @@ function fakeRegistry(options?: { missingProviders?: string[]; profiles?: ModelP
 				maxLevel: ThinkingLevel.XHigh,
 			}),
 			model("anthropic", "claude-sonnet-5"),
+			model("anthropic", "claude-sonnet-5-5"),
 			model("anthropic", "claude-opus-4-6", {
 				mode: "effort",
 				minLevel: ThinkingLevel.Low,
@@ -256,7 +262,7 @@ describe("model profile activation", () => {
 		expect(prepared.defaultThinkingLevel).toBe(ThinkingLevel.XHigh);
 		expect(prepared.defaultChain).toEqual(["anthropic/claude-opus-5-5:medium", "anthropic/claude-opus-4-6:xhigh"]);
 		expect(prepared.agentModelOverrides).toEqual({
-			executor: "anthropic/claude-sonnet-5",
+			executor: "anthropic/claude-sonnet-5-5",
 			planner: ["anthropic/claude-opus-5-5:medium", "anthropic/claude-opus-4-6:low"],
 			critic: ["anthropic/claude-opus-5-5:high", "anthropic/claude-opus-4-6:high"],
 			architect: ["anthropic/claude-opus-5-5:high", "anthropic/claude-opus-4-6:xhigh"],
@@ -347,7 +353,7 @@ describe("model profile activation", () => {
 				{ selector: "anthropic/claude-opus-5-5:medium", reason: "unknown_model" },
 			]);
 			expect(prepared.agentModelOverrides).toMatchObject({
-				executor: "anthropic/claude-sonnet-5",
+				executor: "anthropic/claude-sonnet-5-5",
 				planner: ["anthropic/claude-opus-5-5:medium", "anthropic/claude-opus-4-6:low"],
 				critic: ["anthropic/claude-opus-5-5:high", "anthropic/claude-opus-4-6:high"],
 				architect: ["anthropic/claude-opus-5-5:high", "anthropic/claude-opus-4-6:high"],
@@ -1753,11 +1759,21 @@ describe("model profile activation", () => {
 			},
 		],
 		[
+			"codex-sol61",
+			{
+				default: "openai-codex/gpt-6.1-sol:medium",
+				executor: "openai-codex/gpt-6.1-sol:medium",
+				planner: "openai-codex/gpt-6.1-sol:high",
+				critic: "openai-codex/gpt-6.1-sol:xhigh",
+				architect: "openai-codex/gpt-6-astra:xhigh",
+			},
+		],
+		[
 			"opus-codex",
 			{
 				default: "anthropic/claude-opus-5-5:medium",
 				executor: "openai-codex/gpt-5.6-terra:low",
-				planner: "anthropic/claude-sonnet-5",
+				planner: "anthropic/claude-sonnet-5-5",
 				critic: "openai-codex/gpt-6-sol:xhigh",
 				architect: "openai-codex/gpt-6-sol:high",
 			},
@@ -3195,7 +3211,7 @@ describe("model-profile-activation: OpenAI-compatible proxy routing", () => {
 		expect(prepared.agentModelOverrides).toEqual({
 			executor: "opencodex/opencodex/gpt-5.6-terra:low",
 			architect: "opencodex/opencodex/gpt-6-sol:high",
-			planner: "opencodex/opencodex/anthropic/claude-sonnet-5",
+			planner: "opencodex/opencodex/anthropic/claude-sonnet-5-5",
 			critic: "opencodex/opencodex/gpt-6-sol:xhigh",
 		});
 	});
