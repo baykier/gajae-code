@@ -478,6 +478,7 @@ function identityFor(settings: Settings, kind: ChatDaemonKind): string | undefin
 			cfg["feishu-app"].authorizedOpenIds,
 			String(cfg.redact),
 			cfg.verbosity,
+			String(cfg["feishu-app"].streaming.enabled),
 		]);
 	}
 	if (!isSlackComplete(cfg)) return undefined;

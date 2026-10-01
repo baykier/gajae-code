@@ -339,6 +339,16 @@
 						},
 						"authorizedOpenIds": {
 							"type": "string"
+						},
+						"streaming": {
+							"type": "object",
+							"properties": {
+								"enabled": {
+									"type": "boolean",
+									"default": true
+								}
+							},
+							"additionalProperties": false
 						}
 					},
 					"additionalProperties": false
