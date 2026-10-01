@@ -7,6 +7,7 @@ import {
 	type FeishuAppInboundEnvelope,
 	FeishuAppLiveProvider,
 	type FeishuAppProviderClient,
+	isRedeliveredMessageEvent,
 	parseCardActionEnvelope,
 	parseMessageEnvelope,
 } from "../src/sdk/bus/feishu-app-provider";
@@ -597,5 +598,29 @@ describe("feishu app daemon mention handling", () => {
 		await provider.emit(messageEnvelope("今天天气如何"));
 		expect(provider.texts).toEqual([]);
 		await daemon.stop();
+	});
+});
+describe("feishu app inbound redelivery dedup", () => {
+	test("collapses Feishu event redelivery onto the message id", () => {
+		const seen = new Map<string, number>();
+		expect(isRedeliveredMessageEvent(seen, "om_1", 1_000)).toBe(false);
+		expect(isRedeliveredMessageEvent(seen, "om_1", 20_000)).toBe(true);
+		expect(isRedeliveredMessageEvent(seen, "om_2", 20_001)).toBe(false);
+	});
+
+	test("expires entries after the TTL so a genuinely repeated message stays deliverable", () => {
+		const seen = new Map<string, number>();
+		expect(isRedeliveredMessageEvent(seen, "om_1", 0)).toBe(false);
+		expect(isRedeliveredMessageEvent(seen, "om_1", 10 * 60_000)).toBe(false);
+	});
+
+	test("bounds memory by evicting the oldest entry", () => {
+		const seen = new Map<string, number>();
+		expect(isRedeliveredMessageEvent(seen, "om_a", 1, 600_000, 2)).toBe(false);
+		expect(isRedeliveredMessageEvent(seen, "om_b", 2, 600_000, 2)).toBe(false);
+		expect(isRedeliveredMessageEvent(seen, "om_c", 3, 600_000, 2)).toBe(false);
+		expect(seen.has("om_a")).toBe(false);
+		expect(seen.has("om_b")).toBe(true);
+		expect(isRedeliveredMessageEvent(seen, "om_a", 4, 600_000, 2)).toBe(false);
 	});
 });

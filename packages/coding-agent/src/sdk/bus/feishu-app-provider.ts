@@ -163,6 +163,34 @@ function apiErrorCode(error: unknown): number | undefined {
 /** REST-only surface health/test diagnostics need; no WS lifecycle. */
 export type FeishuAppDiagnosticProvider = Pick<FeishuAppProviderClient, "sendText">;
 
+const FEISHU_APP_INBOUND_DEDUP_TTL_MS = 10 * 60_000;
+const FEISHU_APP_INBOUND_DEDUP_LIMIT = 512;
+/**
+ * Feishu's long connection may push the same message event more than once
+ * (observed ~20s apart), and every push must ack/steer at most once. Message
+ * ids are unique per message, so they are the dedup key; entries expire so a
+ * genuinely repeated user message stays deliverable.
+ */
+export function isRedeliveredMessageEvent(
+	seen: Map<string, number>,
+	messageId: string,
+	now: number,
+	ttlMs = FEISHU_APP_INBOUND_DEDUP_TTL_MS,
+	limit = FEISHU_APP_INBOUND_DEDUP_LIMIT,
+): boolean {
+	for (const [key, seenAt] of seen) {
+		if (now - seenAt >= ttlMs) seen.delete(key);
+	}
+	if (seen.has(messageId)) return true;
+	seen.set(messageId, now);
+	while (seen.size > limit) {
+		const oldest = seen.keys().next().value;
+		if (oldest === undefined) break;
+		seen.delete(oldest);
+	}
+	return false;
+}
+
 export class FeishuAppLiveProvider implements FeishuAppProviderClient {
 	#lark: LarkClient | undefined;
 	#ws: LarkWsClient | undefined;
@@ -175,6 +203,14 @@ export class FeishuAppLiveProvider implements FeishuAppProviderClient {
 
 	get transportHealthy(): boolean {
 		return this.#healthy;
+	}
+
+	/** Redelivery guard: message ids already accepted, oldest first. */
+	readonly #seenMessageIds = new Map<string, number>();
+
+	/** Returns true when the message id was already accepted (within the TTL). */
+	#isRedelivery(messageId: string): boolean {
+		return isRedeliveredMessageEvent(this.#seenMessageIds, messageId, Date.now());
 	}
 
 	async start(onEnvelope: (envelope: FeishuAppInboundEnvelope) => void | Promise<void>): Promise<void> {
@@ -202,6 +238,10 @@ export class FeishuAppLiveProvider implements FeishuAppProviderClient {
 					logger.info(
 						`Feishu app bot dropped an inbound message event (${describeMessageEventDrop(data, this.config.chatId)}).`,
 					);
+					return;
+				}
+				if (envelope.messageId !== undefined && this.#isRedelivery(envelope.messageId)) {
+					logger.info(`Feishu app bot dropped a redelivered message event (${envelope.messageId.slice(-8)}).`);
 					return;
 				}
 				logger.info(`Feishu app bot received a message from ${envelope.senderOpenId ?? "an unknown sender"}.`);
